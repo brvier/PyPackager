@@ -238,7 +238,7 @@ class MaemoPackage(object):
         paths=self.__files.keys()
         paths.sort()
         files=[]
-        CURRENT = os.path.dirname(os.path.abspath(sys.path[0]))
+        CURRENT = sys.path[0]
         for path in paths:
             print '0:',CURRENT,path,os.path.join(CURRENT)
             tarinfo = tarOutput.gettarinfo(os.path.join(CURRENT), path)
