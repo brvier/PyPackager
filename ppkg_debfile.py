@@ -238,8 +238,7 @@ class MaemoPackage(object):
         paths=self.__files.keys()
         paths.sort()
         files=[]
-        CURRENT = sys.path[0]
-        print '1:',paths
+        CURRENT = os.path.dirname(os.path.abspath(sys.path[0]))
         for path in paths:
             print '0:',CURRENT,path,os.path.join(CURRENT)
             tarinfo = tarOutput.gettarinfo(os.path.join(CURRENT), path)
@@ -266,14 +265,17 @@ class MaemoPackage(object):
 #                    tarinfo.size = len(content.getvalue())
 
 #                    tarinfo.gname = ""
-                    print '1:',os.path.join(path,pfile),(os.path.join(os.path.dirname(sys.argv[0]),pfile))
-                    tarOutput.addfilefromstring(os.path.join(path,pfile),file(os.path.join(os.path.dirname(sys.argv[0]),pfile)).read())
+                    print '1:',os.path.join(path,nfile),(os.path.join(CURRENT,pfile))
+                    tarOutput.addfilefromstring(os.path.join(path,nfile),file(os.path.join(CURRENT,pfile)).read())
+
+#                    print '1:',os.path.join(path,pfile),(os.path.join(os.path.dirname(sys.argv[0]),pfile))
+#                    tarOutput.addfilefromstring(os.path.join(path,pfile),file(os.path.join(os.path.dirname(sys.argv[0]),pfile)).read())
 #                    tarOutput.addfile(tarinfo, file(os.path.join(os.path.dirname(sys.argv[0]),pfile)))
 #                    print file(os.path.join(os.path.dirname(sys.argv[0]),pfile)).read()
 #                    tarOutput.addfile(tarinfo, file(pfile))
                 else:
-                    print '2:',path,pfile,nfile,rfile,os.path.dirname(sys.argv[0])
-                    print '3:',os.path.join(CURRENT,os.path.dirname(pfile)), os.path.join(path,os.path.dirname(pfile))
+                    print '2:',path,pfile,nfile,rfile,CURRENT
+                    #print '3:',os.path.join(CURRENT,os.path.dirname(pfile)), os.path.join(path,os.path.dirname(pfile))
                     tarinfo = tarOutput.gettarinfo(os.path.join(CURRENT,os.path.dirname(pfile)), os.path.join(path,os.path.dirname(pfile)))
                     tarinfo.uid = UID_ROOT
                     tarinfo.gid = GID_ROOT
