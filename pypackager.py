@@ -21,7 +21,7 @@ from glob import glob
 from datetime import datetime
 import socket
 
-__version__ = '3.0.16'
+__version__ = '3.0.17'
 __build__ = '1'
 __author__ = "khertan"
 __mail__ = "khertan@khertan.net"
@@ -73,6 +73,7 @@ class PyPackager(object):
     self.description = "No description"
     self.license = "gpl"
     self.depends = "python"
+    self.suggests = ""
     self.section = "user/other"
     self.arch = ""
     self.url = "http://"
@@ -90,7 +91,7 @@ class PyPackager(object):
 
     self.changelog = None
     
-#    self.xsbc_bugtracker = "http://bugs.maemo.org"
+    self.bugtracker = ""
     self.icon = None
     
   def __repr__(self):
@@ -164,6 +165,7 @@ FILES :
       Architecture=self.arch,
       Maintainer=self.maintainer,
       Depends=self.depends,
+      Suggest=self.suggests,
       Description=self.description),
       self.__files)
 
@@ -386,6 +388,7 @@ Package: %(name)s
 Maemo-Display-Name: %(display_name)s
 Architecture: %(arch)s
 Depends: %(depends)s
+Suggests: %(suggests)s
 Description: %(description)s
 %(bugtrackerstr)s
 %(iconstr)s""" % self.__dict__
@@ -700,6 +703,7 @@ if __name__ == "__main__":
     p.maintainer=__author__    
     p.email=__mail__
     p.depends = "python2.5"
+    p.suggests = "khteditor"
     p.section="user/development"
     p.arch="armel"
     p.urgency="low"
@@ -711,5 +715,5 @@ if __name__ == "__main__":
     p["/usr/lib/python2.5/site-packages"] = ["pypackager.py","ppkg_py2tar.py","ppkg_py2dsc.py","ppkg_py2changes.py","ppkg_md5hash.py","ppkg_debfile.py","ppkg_arfile.py"]
 
     print p
-#    print p.generate(build_binary=False,build_src=True)
-    print p.generate(build_binary=True,build_src=False)
+    print p.generate(build_binary=True,build_src=True)
+#    print p.generate(build_binary=True,build_src=False)

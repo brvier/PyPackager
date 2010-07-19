@@ -329,6 +329,7 @@ if __name__ == "__main__":
                     Architecture="all",
                     Maintainer="Benoit HERVIER <khertan@khertan.net>",
                     Depends="python2.5, python2.5-hildon, python2.5-gtk2",
+                    Suggests="",
                     Description="Example packaged Maemo application."
                     ),
         directoryPath
