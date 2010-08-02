@@ -21,7 +21,7 @@ from glob import glob
 from datetime import datetime
 import socket
 
-from pypackager import *
+import pypackager
 
 __build__ = '1'
 __author__ = "khertan"
@@ -34,9 +34,9 @@ if __name__ == "__main__":
     except:
         pass
 
-    p=PyPackager("pypackager")
+    p=pypackager.PyPackager("pypackager")
     p.display_name = 'PyPackager'
-    p.version = __version__
+    p.version = pypackager.__version__
     p.buildversion = __build__
     p.description="Generate simple deb or source deb from python"
     p.upgrade_description="Add support for the upgrade description"
