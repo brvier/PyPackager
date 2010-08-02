@@ -21,7 +21,7 @@ from glob import glob
 from datetime import datetime
 import socket
 
-__version__ = '3.0.17'
+__version__ = '3.0.19'
 __build__ = '1'
 __author__ = "khertan"
 __mail__ = "khertan@khertan.net"
@@ -166,7 +166,8 @@ FILES :
       Maintainer=self.maintainer,
       Depends=self.depends,
       Suggest=self.suggests,
-      Description=self.description),
+      Description=self.description,
+      UpgradeDescription=self.upgrade_description),
       self.__files)
 
     open(self.name+'_'+self.version+'-'+self.buildversion+'_'+self.arch+ '.deb',"wb").write(theMaemoPackage.packed())
@@ -250,6 +251,10 @@ FILES :
       #clean description (add a space before each next lines)
       self.description=self.description.replace("\r","").strip()
       self.description = "\n ".join(self.description.split("\n"))
+
+      #clean upgrade_description (add a space before each next lines)
+      self.upgrade_description=self.upgrade_description.replace("\r","").strip()
+      self.upgrade_description = "\n ".join(self.upgrade_description.split("\n"))
 
       #clean changelog (add 2 spaces before each next lines)
 #      self.changelog=self.changelog.replace('\r','').strip()
@@ -385,11 +390,12 @@ Build-Depends: debhelper (>= 5)
 Standards-Version: 3.7.2
 
 Package: %(name)s
-Maemo-Display-Name: %(display_name)s
+XB-Maemo-Display-Name: %(display_name)s
 Architecture: %(arch)s
 Depends: %(depends)s
 Suggests: %(suggests)s
 Description: %(description)s
+XB-Maemo-Upgrade-Description: %(upgrade_description)s
 %(bugtrackerstr)s
 %(iconstr)s""" % self.__dict__
 
@@ -699,6 +705,7 @@ if __name__ == "__main__":
     p.version = __version__
     p.buildversion = __build__
     p.description="Generate simple deb or source deb from python"
+    p.upgrade_description="Add support for the upgrade description"
     p.author=__author__
     p.maintainer=__author__    
     p.email=__mail__
@@ -709,11 +716,11 @@ if __name__ == "__main__":
     p.urgency="low"
     p.icon='pypackager.png'
     p.distribution="fremantle"
-    p.repository="extras-devel"
-    p.bugtracker = 'http://bugs.maemo.org'
+    p.repository="Khertan Repository"
+    p.bugtracker = 'http://khertan.net/pypackager_bug_tracker'
     p.changelog = "* Fix binary build control file field"
     p["/usr/lib/python2.5/site-packages"] = ["pypackager.py","ppkg_py2tar.py","ppkg_py2dsc.py","ppkg_py2changes.py","ppkg_md5hash.py","ppkg_debfile.py","ppkg_arfile.py"]
 
     print p
-    print p.generate(build_binary=True,build_src=True)
+    print p.generate(build_binary=False,build_src=True)
 #    print p.generate(build_binary=True,build_src=False)

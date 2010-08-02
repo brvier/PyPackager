@@ -53,6 +53,7 @@ class ControlFile(object):
     def __init__(self,Icon,BugTracker,DisplayName,PreInst,PostInst,PreRm,PostRm,
                  long_description = "",
                  Description = "",
+                 UpgradeDescription = None,
                  **kwargs
                  ):
         """
@@ -69,7 +70,8 @@ class ControlFile(object):
         self.postinst=PostInst
         self.prerm=PreRm
         self.postrm=PostRm
-
+        self.upgrade_description = UpgradeDescription
+        
     def _getContent(self):
         """
         """
@@ -88,6 +90,10 @@ class ControlFile(object):
             if self.long_description:
                 self.long_description=self.long_description.replace("\n","\n ")
                 content.append(" " + self.long_description)
+
+        if self.upgrade_description:
+            self.upgrade_description = self.upgrade_description.replace("\n","\n ")
+            content.append("Maemo-Upgrade-Description: %s" % self.upgrade_description)
 
         if self.icon:
             #self.icon=self.icon.replace("\n","\n ")
