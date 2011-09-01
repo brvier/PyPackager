@@ -23,7 +23,7 @@ import socket
 
 import pypackager
 
-__build__ = '1'
+__build__ = '2'
 __author__ = "khertan"
 __mail__ = "khertan@khertan.net"
 
@@ -68,8 +68,8 @@ if __name__ == "__main__":
     print files
 
     
-    p["/usr/lib/python2.5/site-packages"] = files
+    p["/usr/lib/pymodules/python2.6"] = files
     
     print p
-    print p.generate(build_binary=False,build_src=True)
+#    print p.generate(build_binary=False,build_src=True)
     print p.generate(build_binary=True,build_src=False)

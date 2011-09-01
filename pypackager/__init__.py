@@ -731,7 +731,7 @@ if __name__ == "__main__":
     p.maemo_flags = ''
     p.meego_desktop_entry_filename = ''
     
-    p["/usr/lib/python2.5/site-packages"] = ["pypackager.py","ppkg_py2tar.py","ppkg_py2dsc.py","ppkg_py2changes.py","ppkg_md5hash.py","ppkg_debfile.py","ppkg_arfile.py"]
+    p["/usr/lib/pymodules/python2.6"] = ["pypackager.py","ppkg_py2tar.py","ppkg_py2dsc.py","ppkg_py2changes.py","ppkg_md5hash.py","ppkg_debfile.py","ppkg_arfile.py"]
 
     print p
     print p.generate(build_binary=False,build_src=True)
