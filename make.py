@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 ##
-##    Copyright (C) 2007 Khertan khertan@khertan.net
+##    Copyright (C) 2007 Benoit HERVIER (Khertan) khertan@khertan.net
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published
@@ -39,21 +39,22 @@ if __name__ == "__main__":
     p.version = pypackager.__version__
     p.buildversion = __build__
     p.description="Generate simple deb or source deb from python"
-    p.upgrade_description="Add support for the upgrade description"
+    p.upgrade_description="Add support for harmattan"
     p.author=__author__
     p.maintainer=__author__    
     p.email=__mail__
-    p.depends = "python2.5"
+    p.depends = "python"
     p.suggests = "khteditor"
     p.section="user/development"
     p.arch="armel"
     p.urgency="low"
     p.icon='pypackager.png'
-    p.distribution="fremantle"
+    p.distribution="harmattan"
     p.repository="Khertan Repository"
-    p.bugtracker = 'http://khertan.net/pypackager_bug_tracker'
-    p.changelog = "*Add support for the upgrade description"
-    
+    p.bugtracker = 'http://khertan.net/pypackager/bugs'
+    p.changelog = "*Add support for harmattan"
+    p.maemo_flags = 'visible'
+    p.meego_desktop_entry_filename = ''    
     files = []
     
     #Src
@@ -71,4 +72,4 @@ if __name__ == "__main__":
     
     print p
     print p.generate(build_binary=False,build_src=True)
-#    print p.generate(build_binary=True,build_src=False)
+    print p.generate(build_binary=True,build_src=False)

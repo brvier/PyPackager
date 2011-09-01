@@ -21,7 +21,7 @@ from glob import glob
 from datetime import datetime
 import socket
 
-__version__ = '3.0.19'
+__version__ = '3.1.0'
 __build__ = '1'
 __author__ = "khertan"
 __mail__ = "khertan@khertan.net"
@@ -93,6 +93,11 @@ class PyPackager(object):
     
     self.bugtracker = ""
     self.icon = None
+
+    #Maemo_Flags (harmattan)
+    self.maemo_flags = ''
+    #MeeGo_Desktop_Entry_Filename (harmattan)
+    self.meego_desktop_entry_filename = ''
     
   def __repr__(self):
     paths=self.__files.keys()
@@ -167,7 +172,9 @@ FILES :
       Depends=self.depends,
       Suggest=self.suggests,
       Description=self.description,
-      UpgradeDescription=self.upgrade_description),
+      UpgradeDescription=self.upgrade_description,
+      MaemoFlags=self.maemo_flags,
+      MeegoDesktopEntryFilename=self.meego_desktop_entry_filename),
       self.__files)
 
     open(self.name+'_'+self.version+'-'+self.buildversion+'_'+self.arch+ '.deb',"wb").write(theMaemoPackage.packed())
@@ -255,7 +262,7 @@ FILES :
       #clean upgrade_description (add a space before each next lines)
       self.upgrade_description=self.upgrade_description.replace("\r","").strip()
       self.upgrade_description = "\n ".join(self.upgrade_description.split("\n"))
-
+      
       #clean changelog (add 2 spaces before each next lines)
 #      self.changelog=self.changelog.replace('\r','').strip()
 #      self.changelog='\n  '.join(self.changelog.split('\n'))
@@ -396,6 +403,8 @@ Depends: %(depends)s
 Suggests: %(suggests)s
 Description: %(description)s
 XB-Maemo-Upgrade-Description: %(upgrade_description)s
+%(maemo_flags)s
+%(meego_desktop_entry_filename)s
 %(bugtrackerstr)s
 %(iconstr)s""" % self.__dict__
 
@@ -705,11 +714,11 @@ if __name__ == "__main__":
     p.version = __version__
     p.buildversion = __build__
     p.description="Generate simple deb or source deb from python"
-    p.upgrade_description="Add support for the upgrade description"
+    p.upgrade_description="Add support for harmattan"
     p.author=__author__
     p.maintainer=__author__    
     p.email=__mail__
-    p.depends = "python2.5"
+    p.depends = "python"
     p.suggests = "khteditor"
     p.section="user/development"
     p.arch="armel"
@@ -718,7 +727,10 @@ if __name__ == "__main__":
     p.distribution="fremantle"
     p.repository="Khertan Repository"
     p.bugtracker = 'http://khertan.net/pypackager_bug_tracker'
-    p.changelog = "* Fix binary build control file field"
+    p.changelog = "* Add support for Harmattan"
+    p.maemo_flags = ''
+    p.meego_desktop_entry_filename = ''
+    
     p["/usr/lib/python2.5/site-packages"] = ["pypackager.py","ppkg_py2tar.py","ppkg_py2dsc.py","ppkg_py2changes.py","ppkg_md5hash.py","ppkg_debfile.py","ppkg_arfile.py"]
 
     print p

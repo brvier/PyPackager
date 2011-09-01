@@ -54,6 +54,8 @@ class ControlFile(object):
                  long_description = "",
                  Description = "",
                  UpgradeDescription = None,
+                 MaemoFlags='visible',
+                 MeegoDesktopEntryFilename= None,                
                  **kwargs
                  ):
         """
@@ -71,6 +73,9 @@ class ControlFile(object):
         self.prerm=PreRm
         self.postrm=PostRm
         self.upgrade_description = UpgradeDescription
+        self.maemo_flags= MaemoFlags
+        self.meego_desktop_entry_filename = MeegoDesktopEntryFilename
+
         
     def _getContent(self):
         """
@@ -82,6 +87,10 @@ class ControlFile(object):
             content.append("Bugtracker: %s" % self.bugtracker)
         if self.displayname:
             content.append("Maemo-Display-Name: %s" % self.displayname)
+        if self.maemo_flags:
+            content.append("Maemo-Flags: %s" % self.maemo_flags)
+        if self.meego_desktop_entry_filename:
+            content.append("Meego-Desktop-Entry-Filename: %s" % self.meego_desktop_entry_filename)
 
         if self.description:
             self.description=self.description.replace("\n","\n ")
@@ -99,6 +108,7 @@ class ControlFile(object):
             #self.icon=self.icon.replace("\n","\n ")
             content.append("Maemo-Icon-26: \n %s" % self.icon)
             #print self.icon
+
 
         print "\n".join(content) + "\n"
         return "\n".join(content) + "\n"

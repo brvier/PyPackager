@@ -1,3 +1,4 @@
-PyPackager is tool specially designed for python maemo onboard developpers who want to create package onboard on their device.
+PyPackager is a tool specially designed for python Maemo/MeeGo onboard developpers who want to create package onboard on their device.
 
 * 3.0.19 : Add support for the upgrade description
+* 3.1.0 : Add support for harmattan
