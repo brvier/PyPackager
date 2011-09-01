@@ -21,7 +21,7 @@ from glob import glob
 from datetime import datetime
 import socket
 
-__version__ = '3.1.0'
+__version__ = '3.1.1'
 __build__ = '1'
 __author__ = "khertan"
 __mail__ = "khertan@khertan.net"
