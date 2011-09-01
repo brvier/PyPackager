@@ -151,7 +151,7 @@ FILES :
     from ppkg_debfile import MaemoPackage, ControlFile
     import base64    
     try:
-      iconb64 = "\n ".join(base64.encodestring(open(self.icon).read()).split("\n")[0:-1])
+      iconb64 = "".join(base64.encodestring(open(self.icon).read()).split("\n")[0:-1])
     except:
       iconb64= ''
       
@@ -242,10 +242,10 @@ FILES :
           self.changelog="  * no changelog"
 
       if self.section not in PyPackager.SECTIONS:
-          raise PyPackagerException("section '%s' is unknown (%s)" % (section,str(PyPackager.SECTIONS)))
+          raise PyPackagerException("section '%s' is unknown (%s)" % (self.section,str(PyPackager.SECTIONS)))
 
       if self.arch not in PyPackager.ARCHS:
-          raise PyPackagerException("arch '%s' is unknown (%s)"% (arch,str(PyPackager.ARCHS)))
+          raise PyPackagerException("arch '%s' is unknown (%s)"% (self.arch,str(PyPackager.ARCHS)))
 
       if self.license not in PyPackager.LICENSES:
           raise PyPackagerException("License '%s' is unknown (%s)" % (license,str(PyPackager.LICENSES)))
@@ -279,7 +279,6 @@ FILES :
       self.TEMP = ".pypackager_build_folder"
       DEST = os.path.join(self.TEMP,self.name)
       DEBIAN = os.path.join(DEST,"debian")
-      CURRENT = os.path.dirname(sys.argv[0])
 
       # let's start the process
       try:
@@ -378,8 +377,8 @@ FILES :
           if self.icon is not None and os.path.exists(self.icon):
             try:
               import base64
-              iconb64 = "\n ".join(base64.encodestring(open(self.icon).read()).split("\n")[0:-1])
-              self.iconstr = "XB-Maemo-Icon-26:\n %s" % ( iconb64 )
+              iconb64 = "".join(base64.encodestring(open(self.icon).read()).split("\n")[0:-1])
+              self.iconstr = "XB-Maemo-Icon-26: %s" % ( iconb64 )
             except:
               pass
           #==========================================================================

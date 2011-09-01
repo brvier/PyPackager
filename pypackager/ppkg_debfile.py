@@ -106,7 +106,7 @@ class ControlFile(object):
 
         if self.icon:
             #self.icon=self.icon.replace("\n","\n ")
-            content.append("Maemo-Icon-26: \n %s" % self.icon)
+            content.append("Maemo-Icon-26: %s" % self.icon)
             #print self.icon
 
 
