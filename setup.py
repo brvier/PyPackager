@@ -17,7 +17,7 @@ setup(
     author_email = "khertan@khertan.net",
     description = ("PyPackager is an onboard developpers tools"+
                    "which is usefull to create sources and binary"+
-                   "Maemo package."),
+                   "Maemo/Harmattan package."),
     license = "GPL",
     keywords = "package debian maemo",
     url = "http://khertan.net/pypackager",
