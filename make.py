@@ -71,5 +71,5 @@ if __name__ == "__main__":
     p["/usr/lib/pymodules/python2.6"] = files
     
     print p
-#    print p.generate(build_binary=False,build_src=True)
-    print p.generate(build_binary=True,build_src=False)
+    print p.generate(build_binary=False,build_src=True)
+#    print p.generate(build_binary=True,build_src=False)
