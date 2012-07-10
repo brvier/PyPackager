@@ -21,7 +21,7 @@ from glob import glob
 from datetime import datetime
 import socket
 
-__version__ = '3.1.1'
+__version__ = '3.2.1'
 __build__ = '1'
 __author__ = "khertan"
 __mail__ = "khertan@khertan.net"
@@ -402,8 +402,8 @@ Depends: %(depends)s
 Suggests: %(suggests)s
 Description: %(description)s
 XB-Maemo-Upgrade-Description: %(upgrade_description)s
-%(maemo_flags)s
-%(meego_desktop_entry_filename)s
+XB-Maemo-Flags: %(maemo_flags)s
+MeeGo-Desktop-Entry-Filename: %(meego_desktop_entry_filename)s
 %(bugtrackerstr)s
 %(iconstr)s""" % self.__dict__
 

@@ -52,7 +52,7 @@ if __name__ == "__main__":
     p.distribution="harmattan"
     p.repository="Khertan Repository"
     p.bugtracker = 'http://khertan.net/pypackager/bugs'
-    p.changelog = "*Add support for harmattan"
+    p.changelog = "* fix various bug in harmattan source package creation"
     p.maemo_flags = 'visible'
     p.meego_desktop_entry_filename = ''    
     files = []
@@ -71,5 +71,5 @@ if __name__ == "__main__":
     p["/usr/lib/pymodules/python2.6"] = files
     
     print p
-    print p.generate(build_binary=False,build_src=True)
+    print p.generate(build_binary=True,build_src=True)
 #    print p.generate(build_binary=True,build_src=False)
