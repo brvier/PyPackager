@@ -400,8 +400,7 @@ Section: %(section)s
 Priority: extra
 Maintainer: %(author)s <%(email)s>
 Build-Depends: debhelper (>= 8.0.0)""" % self.__dict__
-
-          txt = txt + ", pkg-config, aegis-builder" if (self.aegisManifest) else ''
+          txt = txt + ', pkg-config, aegis-builder' if (self.aegisManifest) else ''
           txt = txt + """
 Standards-Version: 3.9.2
 
@@ -612,13 +611,9 @@ binary-arch: build install
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
-    # ======================================================
-    PACKAGE_TARGETS := $(foreach pkg,$(DEB_ALL_PACKAGES),binary/$(pkg))
-    $(PACKAGE_TARGETS)::
-    [ ! -f debian/$(notdir $@).aegis ] || aegis-deb-add -control \
-    debian/$(notdir $@)/DEBIAN/control .. debian/$(notdir $@).aegis=_aegis
-    # ======================================================
-
+""" % self.__dict__
+          txt = txt + 'aegis-deb-add -control debian/%(name)s/DEBIAN/control .. debian/%(name)s.aegis=_aegis' % self.__dict__ if (self.aegisManifest) else ''
+          txt = txt + """
     binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install configure
 """ % self.__dict__
@@ -738,60 +733,4 @@ binary-arch: build install
           shutil.rmtree(self.TEMP)
 
 if __name__ == "__main__":
-    __build__ = '1'
-    __author__ = "khertan"
-    __mail__ = "khertan@khertan.net"
-
-    try:
-        os.chdir('..')
-    except:
-        pass
-
-    p=PyPackager("pypackager")
-    p.display_name = 'PyPackager'
-    p.version = __version__
-    p.buildversion = __build__
-    p.description="Generate simple deb or source deb from python"
-    p.upgrade_description="Add support for harmattan"
-    p.author=__author__
-    p.maintainer=__author__
-    p.email=__mail__
-    p.depends = "python"
-    p.suggests = "khteditor"
-    p.section="user/development"
-    p.arch="armel"
-    p.urgency="low"
-    p.icon='pypackager.png'
-    p.distribution="harmattan"
-    p.repository="Khertan Repository"
-    p.bugtracker = 'http://khertan.net/pypackager/bugs'
-    p.changelog = "* fix various bug in harmattan source package creation"
-    p.maemo_flags = 'visible'
-    p.meego_desktop_entry_filename = ''
-    p.createDigsigsums = True
-    p.aegisManifest = '''<aegis name="...">
-  <provide></provide>
-  <constraint></constraint>
-  <account></account>
-  <request></request>
-  <domain></domain>
-  <docstring></docstring>
-</aegis>'''
-    files = []
-
-    #Src
-    for root, dirs, fs in os.walk('/home/user/MyDocs/Projects/PyPackager/pypackager'):
-      for f in fs:
-        #print os.path.basename(root),dirs,f
-        prefix = 'pypackager/'
-        if os.path.basename(root) != 'pypackager':
-            prefix = prefix + os.path.basename(root) + '/'
-        files.append(prefix+os.path.basename(f))
-    print files
-
-
-    p["/usr/lib/pymodules/python2.6"] = files
-
-    print p
-    print p.generate(build_binary=True,build_src=True)
-
+    print 'Look at make.py in the git repository to see how to use it'

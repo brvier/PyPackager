@@ -67,11 +67,10 @@ if __name__ == "__main__":
     files = []
 
     #Src
-    for root, dirs, fs in os.walk(os.path.join(os.path.dirname(__file__), 'pypackager')):
+    for root, dirs, fs in os.walk(os.path.join(os.path.dirname(__file__), p.name)):
       for f in fs:
-        #print os.path.basename(root),dirs,f
-        prefix = 'pypackager/'
-        if os.path.basename(root) != 'pypackager':
+        prefix = p.name +'/'
+        if os.path.basename(root) != p.name:
             prefix = prefix + os.path.basename(root) + '/'
         files.append(prefix+os.path.basename(f))
     print files
@@ -79,6 +78,12 @@ if __name__ == "__main__":
 
     p["/usr/lib/pymodules/python2.6"] = files
 
-    print p
     print p.generate(build_binary=True,build_src=True)
-#    print p.generate(build_binary=True,build_src=False)
+
+    if not os.path.exists('dists'):
+        os.mkdir('dists')
+    for filepath in glob(p.name+'_'+p.version+'-'+p.buildversion+'*'):
+        os.rename(filepath, os.path.join(os.path.dirname(filepath), 'dists', os.path.basename(filepath)))
+        #print filepath, ':', os.path.join(os.path.dirname(filepath), 'dists', os.path.basename(filepath))
+
+
