@@ -1,4 +1,16 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+##
+##    Copyright (C) 2007 Khertan khertan@khertan.net
+##
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published
+## by the Free Software Foundation; version 2 only.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
 
 import os 
 import md5hash
@@ -8,27 +20,17 @@ class DscFile(object):
     """
     """
     def __init__(self, StandardsVersion,BuildDepends,files, **kwargs):
-      self.options = kwargs # TODO: Is order important?
+      self.options = kwargs 
       self.StandardsVersion = StandardsVersion
       self.BuildDepends=BuildDepends
       self.files=files
-      #self.category=category
-      #self.repository=repository
-      #self.ChangedBy=ChangedBy
+
 
     def _getContent(self):
         """
         """
         content = ["%s: %s" % (k, v)
                    for k,v in self.options.iteritems()]
-
-        #if self.description:
-        #    self.description=self.description.replace("\n","\n ")
-        #    content.append("Description: %s" % self.description)
-
-        #if self.changes:
-        #    self.changes=self.changes.replace("\n","\n ")
-        #    content.append("Changes: %s" % self.changes)
 
         if self.BuildDepends:
             content.append("Build-Depends: %s" % self.BuildDepends)

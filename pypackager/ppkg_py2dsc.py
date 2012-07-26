@@ -1,9 +1,7 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-##    This file is a part of py2deb
-##    This version of py2deb is a dirty hack made by Khertan based on a mix of PyPackager and Original Py2Deb 0.3
-##    Copyright (C) 2007 manatlan manatlan[at]gmail(dot)com
-##    Copyright (C) 2008 Khertan khertan[at]khertan(dot)net
+##
+##    Copyright (C) 2007 Khertan khertan@khertan.net
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published
@@ -13,7 +11,12 @@
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ## GNU General Public License for more details.
-##
+#
+#    This file was a part of py2deb
+#    This version of py2deb is a dirty hack made by Khertan based on a mix of PyPackager and Original Py2Deb 0.3
+#    Copyright (C) 2007 manatlan manatlan[at]gmail(dot)com
+
+
 import os 
 import ppkg_md5hash
 
@@ -26,9 +29,7 @@ class py2dsc(object):
       self.StandardsVersion = StandardsVersion
       self.BuildDepends=BuildDepends
       self.files=files
-      #self.category=category
-      #self.repository=repository
-      #self.ChangedBy=ChangedBy
+
 
     def _getContent(self):
         """
@@ -36,13 +37,6 @@ class py2dsc(object):
         content = ["%s: %s" % (k, v)
                    for k,v in self.options.iteritems()]
 
-        #if self.description:
-        #    self.description=self.description.replace("\n","\n ")
-        #    content.append("Description: %s" % self.description)
-
-        #if self.changes:
-        #    self.changes=self.changes.replace("\n","\n ")
-        #    content.append("Changes: %s" % self.changes)
 
         if self.BuildDepends:
             content.append("Build-Depends: %s" % self.BuildDepends)

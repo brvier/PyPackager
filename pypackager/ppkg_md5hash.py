@@ -1,16 +1,28 @@
 #!/usr/bin/env python
-
-## md5hash
+# -*- coding: utf-8 -*-
 ##
-## 2004-01-30
+##    Copyright (C) 2007 Khertan khertan@khertan.net
 ##
-## Nick Vargish
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published
+## by the Free Software Foundation; version 2 only.
 ##
-## Simple md5 hash utility for generating md5 checksums of files. 
-##
-## usage: md5hash <filename> [..]
-##
-## Use '-' as filename to sum standard input.
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+#
+# md5hash
+#
+# 2004-01-30
+#
+# Nick Vargish
+#
+# Simple md5 hash utility for generating md5 checksums of files. 
+#
+# usage: md5hash <filename> [..]
+#
+# Use '-' as filename to sum standard input.
 
 import md5
 import sys

@@ -399,9 +399,9 @@ FILES :
 Section: %(section)s
 Priority: extra
 Maintainer: %(author)s <%(email)s>
-Build-Depends: debhelper (>= 5)""" % self.__dict__
+Build-Depends: debhelper (>= 7)""" % self.__dict__
 
-          txt = txt + ", aegis-builder" if (self.aegisManifest) else ''
+          txt = txt + ", pkg-config, aegis-builder" if (self.aegisManifest) else ''
           txt = txt + """
 Standards-Version: 3.7.2
 
@@ -612,10 +612,14 @@ binary-arch: build install
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
-    aegis-deb-add -control debian/%(name)s/DEBIAN/control ..
-    debian/%(name)s.aegis=_aegis
+    # ======================================================
+    PACKAGE_TARGETS := $(foreach pkg,$(DEB_ALL_PACKAGES),binary/$(pkg))
+    $(PACKAGE_TARGETS)::
+    [ ! -f debian/$(notdir $@).aegis ] || aegis-deb-add -control \
+    debian/$(notdir $@)/DEBIAN/control .. debian/$(notdir $@).aegis=_aegis
+    # ======================================================
 
-binary: binary-indep binary-arch
+    binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install configure
 """ % self.__dict__
           open(os.path.join(DEBIAN,"rules"),"w").write(txt)
@@ -734,8 +738,12 @@ binary: binary-indep binary-arch
           shutil.rmtree(self.TEMP)
 
 if __name__ == "__main__":
+    __build__ = '1'
+    __author__ = "khertan"
+    __mail__ = "khertan@khertan.net"
+
     try:
-        os.chdir(os.path.dirname(sys.argv[0]))
+        os.chdir('..')
     except:
         pass
 
@@ -754,15 +762,36 @@ if __name__ == "__main__":
     p.arch="armel"
     p.urgency="low"
     p.icon='pypackager.png'
-    p.distribution="fremantle"
+    p.distribution="harmattan"
     p.repository="Khertan Repository"
-    p.bugtracker = 'http://khertan.net/pypackager_bug_tracker'
-    p.changelog = "* Add support for Harmattan"
-    p.maemo_flags = ''
+    p.bugtracker = 'http://khertan.net/pypackager/bugs'
+    p.changelog = "* fix various bug in harmattan source package creation"
+    p.maemo_flags = 'visible'
     p.meego_desktop_entry_filename = ''
+    p.createDigsigsums = True
+    p.aegisManifest = '''<aegis name="...">
+  <provide></provide>
+  <constraint></constraint>
+  <account></account>
+  <request></request>
+  <domain></domain>
+  <docstring></docstring>
+</aegis>'''
+    files = []
 
-    p["/usr/lib/pymodules/python2.6"] = ["pypackager.py","ppkg_py2tar.py","ppkg_py2dsc.py","ppkg_py2changes.py","ppkg_md5hash.py","ppkg_debfile.py","ppkg_arfile.py"]
+    #Src
+    for root, dirs, fs in os.walk('/home/user/MyDocs/Projects/PyPackager/pypackager'):
+      for f in fs:
+        #print os.path.basename(root),dirs,f
+        prefix = 'pypackager/'
+        if os.path.basename(root) != 'pypackager':
+            prefix = prefix + os.path.basename(root) + '/'
+        files.append(prefix+os.path.basename(f))
+    print files
+
+
+    p["/usr/lib/pymodules/python2.6"] = files
 
     print p
-    print p.generate(build_binary=False,build_src=True)
-#    print p.generate(build_binary=True,build_src=False)
+    print p.generate(build_binary=True,build_src=True)
+
