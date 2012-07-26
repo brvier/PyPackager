@@ -400,7 +400,7 @@ Section: %(section)s
 Priority: extra
 Maintainer: %(author)s <%(email)s>
 Build-Depends: debhelper (>= 8.0.0)""" % self.__dict__
-          txt = txt + ', pkg-config, aegis-builder' if (self.aegisManifest) else ''
+          txt = txt + ', aegis-builder' if (self.aegisManifest) else ''
           txt = txt + """
 Standards-Version: 3.9.2
 
@@ -612,7 +612,7 @@ binary-arch: build install
 	dh_md5sums
 	dh_builddeb
 """ % self.__dict__
-          txt = txt + 'aegis-deb-add -control debian/%(name)s/DEBIAN/control .. debian/%(name)s.aegis=_aegis' % self.__dict__ if (self.aegisManifest) else ''
+          txt = txt + ('aegis-deb-add -control debian/%(name)s/DEBIAN/control .. debian/%(name)s.aegis=_aegis' % self.__dict__) if (self.aegisManifest) else ''
           txt = txt + """
     binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install configure
