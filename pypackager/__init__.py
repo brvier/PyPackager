@@ -99,6 +99,9 @@ class PyPackager(object):
     #MeeGo_Desktop_Entry_Filename (harmattan)
     self.meego_desktop_entry_filename = ''
     
+    #Aegis Digsigsums
+    self.createDigsigsums = False
+    
   def __repr__(self):
     paths=self.__files.keys()
     paths.sort()
@@ -174,7 +177,8 @@ FILES :
       Description=self.description,
       UpgradeDescription=self.upgrade_description,
       MaemoFlags=self.maemo_flags,
-      MeegoDesktopEntryFilename=self.meego_desktop_entry_filename),
+      MeegoDesktopEntryFilename=self.meego_desktop_entry_filename,
+      createDigsigsums=self.createDigsigsums),
       self.__files)
 
     open(self.name+'_'+self.version+'-'+self.buildversion+'_'+self.arch+ '.deb',"wb").write(theMaemoPackage.packed())
@@ -527,9 +531,6 @@ is licensed under the GPL, see above.
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-
-
-
 CFLAGS = -Wall -g
 
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
@@ -617,11 +618,17 @@ binary: binary-indep binary-arch
           ###########################################################################
 
           #http://www.debian.org/doc/manuals/maint-guide/ch-build.fr.html
-          #TODOS
           #ret=os.system('cd "%(DEST)s"; dpkg-buildpackage -tc -rfakeroot -us -uc' % locals())
           #if ret!=0:
           #    raise Py2debException("buildpackage failed (see output)")
 
+          #==========================================================================
+          # CREATE debian/digsigsums
+          #==========================================================================
+          if self.createDigsigsums:
+              from ppkg_digsigsums import generate_digsigsums
+              open(os.path.join(DEBIAN,"digsigsums"),"w").write(generate_digsigsums(self.name, self.__files))
+              
           #Tar
           import ppkg_py2tar
           tarcontent= ppkg_py2tar.py2tar("%(DEST)s" % locals() )

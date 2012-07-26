@@ -41,7 +41,7 @@ if __name__ == "__main__":
     p.description="Generate simple deb or source deb from python"
     p.upgrade_description="Add support for harmattan"
     p.author=__author__
-    p.maintainer=__author__    
+    p.maintainer=__author__
     p.email=__mail__
     p.depends = "python"
     p.suggests = "khteditor"
@@ -54,9 +54,10 @@ if __name__ == "__main__":
     p.bugtracker = 'http://khertan.net/pypackager/bugs'
     p.changelog = "* fix various bug in harmattan source package creation"
     p.maemo_flags = 'visible'
-    p.meego_desktop_entry_filename = ''    
+    p.meego_desktop_entry_filename = ''
+    p.createDigsigsums = True
     files = []
-    
+
     #Src
     for root, dirs, fs in os.walk('/home/user/MyDocs/Projects/pypackager/pypackager'):
       for f in fs:
@@ -67,9 +68,9 @@ if __name__ == "__main__":
         files.append(prefix+os.path.basename(f))
     print files
 
-    
+
     p["/usr/lib/pymodules/python2.6"] = files
-    
+
     print p
     print p.generate(build_binary=True,build_src=True)
 #    print p.generate(build_binary=True,build_src=False)

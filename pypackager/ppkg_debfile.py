@@ -55,7 +55,8 @@ class ControlFile(object):
                  Description = "",
                  UpgradeDescription = None,
                  MaemoFlags='visible',
-                 MeegoDesktopEntryFilename= None,                
+                 MeegoDesktopEntryFilename= None, 
+                 createDigsigsums = False,
                  **kwargs
                  ):
         """
@@ -75,7 +76,7 @@ class ControlFile(object):
         self.upgrade_description = UpgradeDescription
         self.maemo_flags= MaemoFlags
         self.meego_desktop_entry_filename = MeegoDesktopEntryFilename
-
+        self.createDigsigsums = createDigsigsums
         
     def _getContent(self):
         """
@@ -222,6 +223,11 @@ class MaemoPackage(object):
 
         # TODO: Add `postinst` here if needed.
 
+        if self.controlFile.createDigsigsums:
+          from ppkg_digsigsums import generate_digsigsums
+          print "DEBUG:", generate_digsigsums(self.controlFile.options['Package'], self.__files)
+          tarOutput.addfilefromstring("digsigsums", generate_digsigsums(self.controlFile.options['Package'], self.__files))
+              
         tarOutput.close()
 
         control_tar_gz = outputFileObj.getvalue()
