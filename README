@@ -2,3 +2,5 @@ PyPackager is a tool specially designed for python Maemo/MeeGo onboard developpe
 
 * 3.0.19 : Add support for the upgrade description
 * 3.1.0 : Add support for harmattan
+* 3.2.x : Fix many error in harmattan support
+* 3.3.0 : Add support for aegis for harmattan
