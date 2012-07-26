@@ -401,7 +401,7 @@ Priority: extra
 Maintainer: %(author)s <%(email)s>
 Build-Depends: debhelper (>= 5)""" % self.__dict__
 
-          txt = txt + ", aegis-builder (>= 1.4)" if (self.aegisManifest) else ''
+          txt = txt + ", aegis-builder" if (self.aegisManifest) else ''
           txt = txt + """
 Standards-Version: 3.7.2
 
@@ -413,7 +413,7 @@ Suggests: %(suggests)s
 Description: %(description)s
 XB-Maemo-Upgrade-Description: %(upgrade_description)s
 XB-Maemo-Flags: %(maemo_flags)s
-MeeGo-Desktop-Entry-Filename: %(meego_desktop_entry_filename)s
+XB-MeeGo-Desktop-Entry-Filename: %(meego_desktop_entry_filename)s
 %(bugtrackerstr)s
 %(iconstr)s""" % self.__dict__
 
