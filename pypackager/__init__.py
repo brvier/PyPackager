@@ -90,7 +90,7 @@ class PyPackager(object):
     self.postremove = None
 
     self.changelog = None
-    
+
     self.bugtracker = ""
     self.icon = None
 
@@ -98,12 +98,12 @@ class PyPackager(object):
     self.maemo_flags = ''
     #MeeGo_Desktop_Entry_Filename (harmattan)
     self.meego_desktop_entry_filename = ''
-    
+
     #Aegis Digsigsums
     self.createDigsigsums = False
     #Aegis Manifest
     self.aegisManifest = ''
-    
+
   def __repr__(self):
     paths=self.__files.keys()
     paths.sort()
@@ -145,7 +145,7 @@ SCRIPTS : %(scripts)s
 FILES :
 %(files)s
 """ % self.__dict__
-    
+
   def generate(self,build_binary=False,build_src=True):
     if build_binary:
       self.generate_binary()
@@ -154,12 +154,12 @@ FILES :
 
   def generate_binary(self):
     from ppkg_debfile import MaemoPackage, ControlFile
-    import base64    
+    import base64
     try:
       iconb64 = "".join(base64.encodestring(open(self.icon).read()).split("\n")[0:-1])
     except:
       iconb64= ''
-      
+
     theMaemoPackage = MaemoPackage(
       ControlFile(Icon=str(iconb64),
       BugTracker=self.bugtracker,
@@ -202,7 +202,7 @@ FILES :
                Format='1.0',
                Source="%(name)s"%self.__dict__,
                Version="%(version)s-%(buildversion)s"%self.__dict__,
-               Maintainer="%(author)s <%(email)s>"%self.__dict__,                             
+               Maintainer="%(author)s <%(email)s>"%self.__dict__,
                Architecture="%(arch)s"%self.__dict__,
               )
     f = open("%(name)s_%(version)s-%(buildversion)s.dsc"%self.__dict__,"wb")
@@ -227,7 +227,7 @@ FILES :
                     Version="%(version)s-%(buildversion)s"%self.__dict__,
                     Distribution="%(distribution)s"%self.__dict__,
                     Urgency="%(urgency)s"%self.__dict__,
-                    Maintainer="%(maintainer)s <%(email)s>"%self.__dict__                             
+                    Maintainer="%(maintainer)s <%(email)s>"%self.__dict__
                     )
     f = open("%(name)s_%(version)s-%(buildversion)s.changes"%self.__dict__,"wb")
     f.write(changescontent.getContent())
@@ -236,7 +236,7 @@ FILES :
       locale.setlocale(locale.LC_TIME,old_locale)
     except:
       pass
-      
+
   def generate_source(self):
       """ generate a deb of version 'version', with or without 'changelog', with or without a rpm
           (in the current folder)
@@ -269,7 +269,7 @@ FILES :
       #clean upgrade_description (add a space before each next lines)
       self.upgrade_description=self.upgrade_description.replace("\r","").strip()
       self.upgrade_description = "\n ".join(self.upgrade_description.split("\n"))
-      
+
       #clean changelog (add 2 spaces before each next lines)
 #      self.changelog=self.changelog.replace('\r','').strip()
 #      self.changelog='\n  '.join(self.changelog.split('\n'))
@@ -336,7 +336,7 @@ FILES :
           # make dirs right
           dirs= [ i[1:] for i in set(dirs)]
           dirs.sort()
-          
+
           #==========================================================================
           # CREATE debian/dirs
           #==========================================================================
@@ -391,7 +391,7 @@ FILES :
           #==========================================================================
           # CREATE bugtracker
           #==========================================================================
-          self.bugtrackerstr = "XSBC-Bugtracker: %s" % ( self.bugtracker )          
+          self.bugtrackerstr = "XSBC-Bugtracker: %s" % ( self.bugtracker )
           #==========================================================================
           # CREATE debian/control
           #==========================================================================
@@ -399,7 +399,7 @@ FILES :
 Section: %(section)s
 Priority: extra
 Maintainer: %(author)s <%(email)s>
-Build-Depends: debhelper (>= 5)""" % self.__dict__ + "aegis-builder (>= 1.4)" if (self.aegisManifest) else '' + """
+Build-Depends: debhelper (>= 5)""" % self.__dict__ + ", aegis-builder (>= 1.4)" if (self.aegisManifest) else '' + """
 Standards-Version: 3.7.2
 
 Package: %(name)s
@@ -609,7 +609,7 @@ binary-arch: build install
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
-    aegis-deb-add -control debian/%(name)s/DEBIAN/control .. 
+    aegis-deb-add -control debian/%(name)s/DEBIAN/control ..
     debian/%(name)s.aegis=_aegis
 
 binary: binary-indep binary-arch
@@ -633,7 +633,7 @@ binary: binary-indep binary-arch
           if self.createDigsigsums:
               from ppkg_digsigsums import generate_digsigsums
               open(os.path.join(DEBIAN,"digsigsums"),"w").write(generate_digsigsums(self.name, self.__files))
-              
+
           #==========================================================================
           # CREATE debian/_aegis manifest
           # <aegis name="...">
@@ -644,12 +644,12 @@ binary: binary-indep binary-arch
           #  <domain> ... </domain>
           #  <docstring> ... </docstring>
           #</aegis>'''
-          #==========================================================================         
-          
+          #==========================================================================
+
           if self.aegisManifest:
             mkscript(self.aegisManifest, '%s.aegis' % self.__dict__['name'])
 
-          
+
           #Tar
           import ppkg_py2tar
           tarcontent= ppkg_py2tar.py2tar("%(DEST)s" % locals() )
@@ -670,7 +670,7 @@ binary: binary-indep binary-arch
                      Format='1.0',
                      Source="%(name)s"%self.__dict__,
                      Version="%(version)s-%(buildversion)s"%self.__dict__,
-                     Maintainer="%(author)s <%(email)s>"%self.__dict__,                             
+                     Maintainer="%(author)s <%(email)s>"%self.__dict__,
                      Architecture="%(arch)s"%self.__dict__,
                     )
           f = open("%(TEMP)s/%(name)s_%(version)s-%(buildversion)s.dsc"%self.__dict__,"wb")
@@ -695,7 +695,7 @@ binary: binary-indep binary-arch
                           Version="%(version)s-%(buildversion)s"%self.__dict__,
                           Distribution="%(distribution)s"%self.__dict__,
                           Urgency="%(urgency)s"%self.__dict__,
-                          Maintainer="%(maintainer)s <%(email)s>"%self.__dict__                             
+                          Maintainer="%(maintainer)s <%(email)s>"%self.__dict__
                           )
           f = open("%(TEMP)s/%(name)s_%(version)s-%(buildversion)s.changes"%self.__dict__,"wb")
           f.write(changescontent.getContent())
@@ -743,7 +743,7 @@ if __name__ == "__main__":
     p.description="Generate simple deb or source deb from python"
     p.upgrade_description="Add support for harmattan"
     p.author=__author__
-    p.maintainer=__author__    
+    p.maintainer=__author__
     p.email=__mail__
     p.depends = "python"
     p.suggests = "khteditor"
@@ -757,7 +757,7 @@ if __name__ == "__main__":
     p.changelog = "* Add support for Harmattan"
     p.maemo_flags = ''
     p.meego_desktop_entry_filename = ''
-    
+
     p["/usr/lib/pymodules/python2.6"] = ["pypackager.py","ppkg_py2tar.py","ppkg_py2dsc.py","ppkg_py2changes.py","ppkg_md5hash.py","ppkg_debfile.py","ppkg_arfile.py"]
 
     print p
