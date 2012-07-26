@@ -67,7 +67,7 @@ if __name__ == "__main__":
     files = []
 
     #Src
-    for root, dirs, fs in os.walk('/home/user/MyDocs/Projects/PyPackager/pypackager'):
+    for root, dirs, fs in os.walk(os.path.join(os.path.dirname(__file__), 'pypackager')):
       for f in fs:
         #print os.path.basename(root),dirs,f
         prefix = 'pypackager/'
