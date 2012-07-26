@@ -23,7 +23,7 @@ import socket
 
 import pypackager
 
-__build__ = '2'
+__build__ = '1'
 __author__ = "khertan"
 __mail__ = "khertan@khertan.net"
 
@@ -56,6 +56,14 @@ if __name__ == "__main__":
     p.maemo_flags = 'visible'
     p.meego_desktop_entry_filename = ''
     p.createDigsigsums = True
+    p.aegisManifest = '''<aegis name="...">
+  <provide></provide>
+  <constraint></constraint>
+  <account></account>
+  <request></request>
+  <domain></domain>
+  <docstring></docstring>
+</aegis>'''
     files = []
 
     #Src

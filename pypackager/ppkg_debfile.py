@@ -56,7 +56,8 @@ class ControlFile(object):
                  UpgradeDescription = None,
                  MaemoFlags='visible',
                  MeegoDesktopEntryFilename= None, 
-                 createDigsigsums = False,
+                 createDigsigsums = False, 
+                 aegisManifest = None,
                  **kwargs
                  ):
         """
@@ -77,6 +78,7 @@ class ControlFile(object):
         self.maemo_flags= MaemoFlags
         self.meego_desktop_entry_filename = MeegoDesktopEntryFilename
         self.createDigsigsums = createDigsigsums
+        self.aegisManifest = aegisManifest
         
     def _getContent(self):
         """
@@ -160,6 +162,10 @@ class MaemoPackage(object):
         ## Add compressed data file(s)
         theDeb.files.append(self._getDataFiles())
 
+        ## Add _aegis if needed
+        if self.controlFile.aegisManifest:
+            theDeb.files.append(self._getAegisFile())
+            
         return theDeb.packed()
         
     def _getSize(self):
@@ -225,9 +231,13 @@ class MaemoPackage(object):
 
         if self.controlFile.createDigsigsums:
           from ppkg_digsigsums import generate_digsigsums
-          print "DEBUG:", generate_digsigsums(self.controlFile.options['Package'], self.__files)
           tarOutput.addfilefromstring("digsigsums", generate_digsigsums(self.controlFile.options['Package'], self.__files))
-              
+
+        if self.controlFile.aegisManifest:
+          from ppkg_digsigsums import generate_digsigsums
+          print type(self.controlFile.aegisManifest), ':', self.controlFile.aegisManifest
+          tarOutput.addfilefromstring("%s.aegis" % FILENAME_DEB_VERSION, self.controlFile.aegisManifest)
+          
         tarOutput.close()
 
         control_tar_gz = outputFileObj.getvalue()
@@ -243,6 +253,18 @@ class MaemoPackage(object):
         return controlFile
 
 
+    def _getAegisFile(self):
+        return \
+        ppkg_arfile.FileInfo(name = FILENAME_DEB_VERSION,
+                        modificationTime = int(time.time()),
+                        userId = UID_ROOT,
+                        groupId = GID_ROOT,
+                        fileMode = PERMS_URW_GRW_OR,
+                        fileSize = len(self.controlFile.aegisManifest),
+                        data = self.controlFile.aegisManifest)
+        
+
+                                
     def _getDataFiles(self):
         """
         """

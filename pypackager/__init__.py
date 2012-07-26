@@ -21,7 +21,7 @@ from glob import glob
 from datetime import datetime
 import socket
 
-__version__ = '3.2.1'
+__version__ = '3.3.0'
 __build__ = '1'
 __author__ = "khertan"
 __mail__ = "khertan@khertan.net"
@@ -101,6 +101,8 @@ class PyPackager(object):
     
     #Aegis Digsigsums
     self.createDigsigsums = False
+    #Aegis Manifest
+    self.aegisManifest = ''
     
   def __repr__(self):
     paths=self.__files.keys()
@@ -178,7 +180,8 @@ FILES :
       UpgradeDescription=self.upgrade_description,
       MaemoFlags=self.maemo_flags,
       MeegoDesktopEntryFilename=self.meego_desktop_entry_filename,
-      createDigsigsums=self.createDigsigsums),
+      createDigsigsums=self.createDigsigsums,
+      aegisManifest = self.aegisManifest),
       self.__files)
 
     open(self.name+'_'+self.version+'-'+self.buildversion+'_'+self.arch+ '.deb',"wb").write(theMaemoPackage.packed())
@@ -396,7 +399,7 @@ FILES :
 Section: %(section)s
 Priority: extra
 Maintainer: %(author)s <%(email)s>
-Build-Depends: debhelper (>= 5)
+Build-Depends: debhelper (>= 5)""" % self.__dict__ + "aegis-builder (>= 1.4)" if (self.aegisManifest) else '' + """
 Standards-Version: 3.7.2
 
 Package: %(name)s
@@ -606,6 +609,8 @@ binary-arch: build install
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
+    aegis-deb-add -control debian/%(name)s/DEBIAN/control .. 
+    debian/%(name)s.aegis=_aegis
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install configure
@@ -629,6 +634,22 @@ binary: binary-indep binary-arch
               from ppkg_digsigsums import generate_digsigsums
               open(os.path.join(DEBIAN,"digsigsums"),"w").write(generate_digsigsums(self.name, self.__files))
               
+          #==========================================================================
+          # CREATE debian/_aegis manifest
+          # <aegis name="...">
+          #  <provide> ... </provide>
+          #  <constraint> ... </constraint>
+          #  <account> ... </account>
+          #  <request> ... </request>
+          #  <domain> ... </domain>
+          #  <docstring> ... </docstring>
+          #</aegis>'''
+          #==========================================================================         
+          
+          if self.aegisManifest:
+            mkscript(self.aegisManifest, '%s.aegis' % self.__dict__['name'])
+
+          
           #Tar
           import ppkg_py2tar
           tarcontent= ppkg_py2tar.py2tar("%(DEST)s" % locals() )
