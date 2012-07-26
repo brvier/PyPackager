@@ -399,9 +399,11 @@ FILES :
 Section: %(section)s
 Priority: extra
 Maintainer: %(author)s <%(email)s>
-Build-Depends: debhelper (>= 5)""" % self.__dict__ + ", aegis-builder (>= 1.4)" if (self.aegisManifest) else '' + """
-Standards-Version: 3.7.2
+Build-Depends: debhelper (>= 5)""" % self.__dict__
 
+          txt = txt + ", aegis-builder (>= 1.4)" if (self.aegisManifest) else ''
+          txt = txt + """
+Standards-Version: 3.7.2
 Package: %(name)s
 XB-Maemo-Display-Name: %(display_name)s
 Architecture: %(arch)s
