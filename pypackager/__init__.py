@@ -81,10 +81,10 @@ class PyPackager(object):
     self.buildversion = '1'
     self.__files = {}
 
-    self.preinstall = None
-    self.postinstall = None
-    self.preremove = None
-    self.postremove = None
+    self.preinst = None
+    self.postinst = None
+    self.prerm = None
+    self.postrm = None
 
     self.changelog = None
 
@@ -115,10 +115,10 @@ class PyPackager(object):
     files.sort()
     self.files = "\n".join(files)
 
-    lscripts = [    self.preinstall and "preinst",
-                    self.postinstall and "postinst",
-                    self.preremove  and "prerm",
-                    self.postremove and "postrm",
+    lscripts = [    self.preinst and "preinst",
+                    self.postinst and "postinst",
+                    self.prerm  and "prerm",
+                    self.postrm and "postrm",
                 ]
     self.scripts = lscripts and ", ".join([i for i in lscripts if i]) or "None"
     return """
@@ -161,10 +161,10 @@ FILES :
       ControlFile(Icon=str(iconb64),
       BugTracker=self.bugtracker,
       DisplayName=self.display_name,
-      PreInst=self.preinstall,
-      PostInst=self.postinstall,
-      PreRm=self.preremove,
-      PostRm=self.postremove,
+      PreInst=self.preinst,
+      PostInst=self.postinst,
+      PreRm=self.prerm,
+      PostRm=self.postrm,
       Package=self.name,
       Version=self.version+'-'+self.buildversion,
       Section=self.section,
@@ -361,10 +361,10 @@ FILES :
                   print os.path.join(DEBIAN,dest)
                   open(os.path.join(DEBIAN,dest),"wb").write(content)
 
-          mkscript(self.preinstall ,"preinst")
-          mkscript(self.postinstall,"postinst")
-          mkscript(self.preremove  ,"prerm")
-          mkscript(self.postremove ,"postrm")
+          mkscript(self.preinst ,"preinst")
+          mkscript(self.postinst,"postinst")
+          mkscript(self.prerm  ,"prerm")
+          mkscript(self.postrm ,"postrm")
 
 
           #==========================================================================

@@ -62,14 +62,10 @@ if __name__ == "__main__":
     files = []
 
     #Src
+    #Src
     for root, dirs, fs in os.walk(os.path.join(os.path.dirname(__file__), p.name)):
       for f in fs:
-        prefix = p.name +'/'
-        if os.path.basename(root) != p.name:
-            prefix = prefix + os.path.basename(root) + '/'
-        files.append(prefix+os.path.basename(f))
-    print files
-
+        files.append(os.path.join(root, f))
 
     p["/usr/lib/pymodules/python2.6"] = files
 
