@@ -387,7 +387,7 @@ FILES :
           # CREATE bugtracker
           #==========================================================================
           self.bugtrackerstr = "XSBC-Bugtracker: %s" % ( self.bugtracker )
-          
+
           self.build_depends = 'debhelper (>= 8.0.0)'
           self.build_depends = self.build_depends + ", pkg-config, aegis-builder" if (self.aegisManifest) else ''
           #==========================================================================
@@ -608,10 +608,10 @@ binary-arch: build install
 	dh_md5sums
 	dh_builddeb
 """ % self.__dict__
-          txt = txt + ('	aegis-deb-add -control debian/%(name)s/DEBIAN/control .. debian/%(name)s.aegis=_aegis' % self.__dict__) if (self.aegisManifest) else ''
+          if self.aegisManifest:
+              txt = txt + '\taegis-deb-add -control debian/%(name)s/DEBIAN/control .. debian/%(name)s.aegis=_aegis' % self.__dict__
           txt = txt + """
 binary: binary-indep binary-arch
-
 .PHONY: build clean binary-indep binary-arch binary install configure
 """ % self.__dict__
           open(os.path.join(DEBIAN,"rules"),"wb").write(txt)
@@ -673,7 +673,7 @@ binary: binary-indep binary-arch
           f = open("%(TEMP)s/%(name)s_%(version)s-%(buildversion)s.dsc"%self.__dict__,"wb")
           f.write(dsccontent._getContent())
           f.close()
-          
+
           #Changes
           from ppkg_changesfile import ChangesFile
           changescontent = ChangesFile(
