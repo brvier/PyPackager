@@ -166,7 +166,6 @@ class MaemoPackage(object):
       size = 0
       paths=self.__files.keys()
       paths.sort()
-      files=[]
       CURRENT = os.path.dirname(sys.argv[0])
       for path in paths:
           for pfile,nfile in self.__files[path]:
@@ -216,7 +215,7 @@ class MaemoPackage(object):
           tarOutput.addfilefromstring("digsigsums", generate_digsigsums(self.controlFile.options['Package'], self.__files))
 
         if self.controlFile.aegisManifest:
-          from ppkg_digsigsums import generate_digsigsums
+
           print type(self.controlFile.aegisManifest), ':', self.controlFile.aegisManifest
           tarOutput.addfilefromstring("%s.aegis" % FILENAME_DEB_VERSION, self.controlFile.aegisManifest)
           
@@ -263,7 +262,7 @@ class MaemoPackage(object):
         # TODO: Add this as a method for TarFile and tidy-up?
         paths=self.__files.keys()
         paths.sort()
-        files=[]
+
         CURRENT = sys.path[0]
         for path in paths:
             print '0:',CURRENT,path,os.path.join(CURRENT)

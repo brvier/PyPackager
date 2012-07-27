@@ -11,9 +11,13 @@
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ## GNU General Public License for more details.
+#
+#    This file was a part of py2deb
+#    This version of py2deb is a dirty hack made by Khertan based on a mix of PyPackager and Original Py2Deb 0.3
+#    Copyright (C) 2007 manatlan manatlan[at]gmail(dot)com
 
 import os 
-import md5hash
+import ppkg_md5hash
 
 class DscFile(object):
 
@@ -34,14 +38,12 @@ class DscFile(object):
 
         if self.BuildDepends:
             content.append("Build-Depends: %s" % self.BuildDepends)
-        if self.StandardsVersion:
-            content.append("Standards-Version: %s" % self.StandardsVersion)
-            
+        content.append("Standards-Version: 3.9.2")            
         content.append('Files:')
 
         for onefile in self.files:
             print onefile
-            md5=md5hash.md5sum(onefile)
+            md5=ppkg_md5hash.md5sum(onefile)
             size=os.stat(onefile).st_size.__str__()
             content.append(' '+md5 + ' ' + size +' '+os.path.basename(onefile))
 

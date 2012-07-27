@@ -14,16 +14,11 @@
 
 import os
 import sys
-import shutil
-import time
-import string
 from glob import glob
-from datetime import datetime
-import socket
 
 import pypackager
 
-__build__ = '1'
+__build__ = '2'
 __author__ = "khertan"
 __mail__ = "khertan@khertan.net"
 
@@ -51,7 +46,7 @@ if __name__ == "__main__":
     p.icon='pypackager.png'
     p.distribution="harmattan"
     p.repository="Khertan Repository"
-    p.bugtracker = 'http://khertan.net/pypackager/bugs'
+    p.bugtracker = 'http://github.com/khertan/PyPackager/issues'
     p.changelog = "* fix various bug in harmattan source package creation"
     p.maemo_flags = 'visible'
     p.meego_desktop_entry_filename = ''
@@ -84,6 +79,6 @@ if __name__ == "__main__":
         os.mkdir('dists')
     for filepath in glob(p.name+'_'+p.version+'-'+p.buildversion+'*'):
         os.rename(filepath, os.path.join(os.path.dirname(filepath), 'dists', os.path.basename(filepath)))
-        #print filepath, ':', os.path.join(os.path.dirname(filepath), 'dists', os.path.basename(filepath))
+
 
 

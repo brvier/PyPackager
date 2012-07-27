@@ -13,13 +13,10 @@
 ## GNU General Public License for more details.
 
 import os
-import sys
 import shutil
 import time
-import string
 from glob import glob
 from datetime import datetime
-import socket
 
 __version__ = '3.3.0'
 __build__ = '1'
@@ -187,30 +184,28 @@ FILES :
     open(self.name+'_'+self.version+'-'+self.buildversion+'_'+self.arch+ '.deb',"wb").write(theMaemoPackage.packed())
 
     #Dsc
-    import ppkg_py2dsc
+    from ppkg_dscfile import DscFile
     import locale
-    import commands
-#          from subprocess import *
     try:
       old_locale,iso=locale.getlocale(locale.LC_TIME)
       locale.setlocale(locale.LC_TIME,'en_US')
     except:
       pass
-    dsccontent = ppkg_py2dsc.py2dsc("%(version)s-%(buildversion)s"%self.__dict__,
+    dsccontent = DscFile("%(version)s-%(buildversion)s"%self.__dict__,
                "%(depends)s"%self.__dict__,
                ("%(name)s_%(version)s-%(buildversion)s_%(arch)s.deb"%self.__dict__,),
                Format='1.0',
                Source="%(name)s"%self.__dict__,
                Version="%(version)s-%(buildversion)s"%self.__dict__,
-               Maintainer="%(author)s <%(email)s>"%self.__dict__,
+               Maintainer="%(maintainer)s <%(email)s>"%self.__dict__,
                Architecture="%(arch)s"%self.__dict__,
               )
     f = open("%(name)s_%(version)s-%(buildversion)s.dsc"%self.__dict__,"wb")
     f.write(dsccontent._getContent())
     f.close()
     #Changes
-    import ppkg_py2changes
-    changescontent = ppkg_py2changes.py2changes(
+    from ppkg_changesfile import ChangesFile
+    changescontent = ChangesFile(
                     "%(author)s <%(email)s>"%self.__dict__,
                     "%(description)s"%self.__dict__,
                     "%(changelog)s"%self.__dict__,
@@ -340,7 +335,7 @@ FILES :
           #==========================================================================
           # CREATE debian/dirs
           #==========================================================================
-          open(os.path.join(DEBIAN,"dirs"),"w").write("\n".join(dirs))
+          open(os.path.join(DEBIAN,"dirs"),"wb").write("\n".join(dirs))
 
           #==========================================================================
           # CREATE debian/changelog
@@ -352,7 +347,7 @@ FILES :
  -- %(author)s <%(email)s>  %(buildDate)s
 """ % self.__dict__
 
-          open(os.path.join(DEBIAN,"changelog"),"w").write(clog)
+          open(os.path.join(DEBIAN,"changelog"),"wb").write(clog)
 
           #==========================================================================
           #Create pre/post install/remove
@@ -364,7 +359,7 @@ FILES :
                   else:   # it's a script
                       content = name
                   print os.path.join(DEBIAN,dest)
-                  open(os.path.join(DEBIAN,dest),"w").write(content)
+                  open(os.path.join(DEBIAN,dest),"wb").write(content)
 
           mkscript(self.preinstall ,"preinst")
           mkscript(self.postinstall,"postinst")
@@ -375,7 +370,7 @@ FILES :
           #==========================================================================
           # CREATE debian/compat
           #==========================================================================
-          open(os.path.join(DEBIAN,"compat"),"w").write("5\n")
+          open(os.path.join(DEBIAN,"compat"),"w").write("7\n")
 
           #==========================================================================
           # CREATE icon
@@ -392,16 +387,17 @@ FILES :
           # CREATE bugtracker
           #==========================================================================
           self.bugtrackerstr = "XSBC-Bugtracker: %s" % ( self.bugtracker )
+          
+          self.build_depends = 'debhelper (>= 8.0.0)'
+          self.build_depends = self.build_depends + ", pkg-config, aegis-builder" if (self.aegisManifest) else ''
           #==========================================================================
           # CREATE debian/control
           #==========================================================================
           txt="""Source: %(name)s
 Section: %(section)s
-Priority: extra
-Maintainer: %(author)s <%(email)s>
-Build-Depends: debhelper (>= 8.0.0)""" % self.__dict__
-          txt = txt + ', aegis-builder' if (self.aegisManifest) else ''
-          txt = txt + """
+Priority: optional
+Maintainer: %(maintainer)s <%(email)s>
+Build-Depends: %(build_depends)s
 Standards-Version: 3.9.2
 
 Package: %(name)s
@@ -416,7 +412,7 @@ XB-MeeGo-Desktop-Entry-Filename: %(meego_desktop_entry_filename)s
 %(bugtrackerstr)s
 %(iconstr)s""" % self.__dict__
 
-          open(os.path.join(DEBIAN,"control"),"w").write(txt)
+          open(os.path.join(DEBIAN,"control"),"wb").write(txt)
 
           #==========================================================================
           # CREATE debian/copyright
@@ -520,7 +516,7 @@ is licensed under the GPL, see above.
 # Please also look if there are files or directories which have a
 # different copyright/license attached and list them here.
 """ % self.__dict__
-          open(os.path.join(DEBIAN,"copyright"),"w").write(txt)
+          open(os.path.join(DEBIAN,"copyright"),"wb").write(txt)
 
           #==========================================================================
           # CREATE debian/rules
@@ -612,12 +608,13 @@ binary-arch: build install
 	dh_md5sums
 	dh_builddeb
 """ % self.__dict__
-          txt = txt + ('aegis-deb-add -control debian/%(name)s/DEBIAN/control .. debian/%(name)s.aegis=_aegis' % self.__dict__) if (self.aegisManifest) else ''
+          txt = txt + ('	aegis-deb-add -control debian/%(name)s/DEBIAN/control .. debian/%(name)s.aegis=_aegis' % self.__dict__) if (self.aegisManifest) else ''
           txt = txt + """
-    binary: binary-indep binary-arch
+binary: binary-indep binary-arch
+
 .PHONY: build clean binary-indep binary-arch binary install configure
 """ % self.__dict__
-          open(os.path.join(DEBIAN,"rules"),"w").write(txt)
+          open(os.path.join(DEBIAN,"rules"),"wb").write(txt)
           os.chmod(os.path.join(DEBIAN,"rules"),0755)
 
           ###########################################################################
@@ -634,7 +631,7 @@ binary-arch: build install
           #==========================================================================
           if self.createDigsigsums:
               from ppkg_digsigsums import generate_digsigsums
-              open(os.path.join(DEBIAN,"digsigsums"),"w").write(generate_digsigsums(self.name, self.__files))
+              open(os.path.join(DEBIAN,"digsigsums"),"wb").write(generate_digsigsums(self.name, self.__files))
 
           #==========================================================================
           # CREATE debian/_aegis manifest
@@ -653,34 +650,33 @@ binary-arch: build install
 
 
           #Tar
-          import ppkg_py2tar
-          tarcontent= ppkg_py2tar.py2tar("%(DEST)s" % locals() )
+          from ppkg_tarfile import myTarFile
+          tarcontent= myTarFile("%(DEST)s" % locals() )
           open("%(TEMP)s/%(name)s_%(version)s-%(buildversion)s.tar.gz"%self.__dict__,"wb").write(tarcontent.packed())
           #Dsc
-          import ppkg_py2dsc
+          from ppkg_dscfile import DscFile
           import locale
-          import commands
-#          from subprocess import *
           try:
             old_locale,iso=locale.getlocale(locale.LC_TIME)
             locale.setlocale(locale.LC_TIME,'en_US')
           except:
             pass
-          dsccontent = ppkg_py2dsc.py2dsc("%(version)s-%(buildversion)s"%self.__dict__,
-                     "%(depends)s"%self.__dict__,
-                     ("%(TEMP)s/%(name)s_%(version)s-%(buildversion)s.tar.gz"%self.__dict__,),
+          dsccontent = DscFile('%(version)s-%(buildversion)s' % self.__dict__,
+                     self.build_depends,
+                     ('%(TEMP)s/%(name)s_%(version)s-%(buildversion)s.tar.gz' % self.__dict__, ),
                      Format='1.0',
                      Source="%(name)s"%self.__dict__,
                      Version="%(version)s-%(buildversion)s"%self.__dict__,
-                     Maintainer="%(author)s <%(email)s>"%self.__dict__,
+                     Maintainer="%(maintainer)s <%(email)s>"%self.__dict__,
                      Architecture="%(arch)s"%self.__dict__,
                     )
           f = open("%(TEMP)s/%(name)s_%(version)s-%(buildversion)s.dsc"%self.__dict__,"wb")
           f.write(dsccontent._getContent())
           f.close()
+          
           #Changes
-          import ppkg_py2changes
-          changescontent = ppkg_py2changes.py2changes(
+          from ppkg_changesfile import ChangesFile
+          changescontent = ChangesFile(
                           "%(author)s <%(email)s>"%self.__dict__,
                           "%(description)s"%self.__dict__,
                           "%(changelog)s"%self.__dict__,
