@@ -18,7 +18,7 @@ from glob import glob
 
 import pypackager
 
-__build__ = '2'
+__build__ = '5'
 __author__ = "khertan"
 __mail__ = "khertan@khertan.net"
 
@@ -47,18 +47,11 @@ if __name__ == "__main__":
     p.distribution="harmattan"
     p.repository="Khertan Repository"
     p.bugtracker = 'http://github.com/khertan/PyPackager/issues'
-    p.changelog = "* fix various bug in harmattan source package creation"
+    p.changelog = "Fix permission on script post/pre inst/rm."
     p.maemo_flags = 'visible'
     p.meego_desktop_entry_filename = ''
     p.createDigsigsums = True
-    p.aegisManifest = '''<aegis name="...">
-  <provide></provide>
-  <constraint></constraint>
-  <account></account>
-  <request></request>
-  <domain></domain>
-  <docstring></docstring>
-</aegis>'''
+    p.aegisManifest = ''
     files = []
 
     #Src

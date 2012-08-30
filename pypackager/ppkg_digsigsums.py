@@ -18,15 +18,16 @@ import sys
 import os
 import hashlib
 
-
 def check_file(filePath):
+    if not os.path.exists(filePath): #To be able to hash StringIO
+      return True
     fh = open(filePath, 'r')
     if fh.read(2) == '#!':
         fh.close()
         return True
     fh.close()
     return False
-    
+
 def hash_file(packageName, src_filepath, dst_filepath):
     # digsigsums format:
     # S 15 com.nokia.maemo H 40 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx R 5 abcde
@@ -35,12 +36,16 @@ def hash_file(packageName, src_filepath, dst_filepath):
         dst_filepath = 'var/lib/dpkg/info/{0}.{1}'.format(packageName, dst_filepath[8+len(packageName):])
     if dst_filepath.startswith('/'):
         dst_filepath = dst_filepath[1:]
-
-    fileToHash = open (src_filepath, 'rb')
-    sha1 = hashlib.sha1()
-    sha1.update(fileToHash.read())
-    hashString = sha1.hexdigest()
-    fileToHash.close()
+    if os.path.exists(src_filepath):
+      fileToHash = open (src_filepath, 'rb')
+      sha1 = hashlib.sha1()
+      sha1.update(fileToHash.read())
+      hashString = sha1.hexdigest()
+      fileToHash.close()
+    else:
+      sha1 = hashlib.sha1()
+      sha1.update(src_filepath)
+      hashString = sha1.hexdigest()
     return 'S 15 com.nokia.maemo H 40 {0} R {1} {2}\n'.format(hashString, len(dst_filepath), dst_filepath)
 
 def generate_digsigsums(packageName, files):

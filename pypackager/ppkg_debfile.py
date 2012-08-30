@@ -51,8 +51,8 @@ class ControlFile(object):
                  Description = "",
                  UpgradeDescription = None,
                  MaemoFlags='visible',
-                 MeegoDesktopEntryFilename= None, 
-                 createDigsigsums = False, 
+                 MeegoDesktopEntryFilename= None,
+                 createDigsigsums = False,
                  aegisManifest = None,
                  **kwargs
                  ):
@@ -75,13 +75,13 @@ class ControlFile(object):
         self.meego_desktop_entry_filename = MeegoDesktopEntryFilename
         self.createDigsigsums = createDigsigsums
         self.aegisManifest = aegisManifest
-        
+
     def _getContent(self):
         """
         """
         content = ["%s: %s" % (k, v)
                    for k,v in self.options.iteritems()]
-	
+
         if self.bugtracker:
             content.append("Bugtracker: %s" % self.bugtracker)
         if self.displayname:
@@ -94,7 +94,7 @@ class ControlFile(object):
         if self.description:
             self.description=self.description.replace("\n","\n ")
             content.append("Description: %s" % self.description)
-            
+
             if self.long_description:
                 self.long_description=self.long_description.replace("\n","\n ")
                 content.append(" " + self.long_description)
@@ -127,9 +127,9 @@ class TarFile(_TarFile):
         theFileInfo.size = len(content.getvalue())
         theFileInfo.uid = UID_ROOT
         theFileInfo.gid = GID_ROOT
+        theFileInfo.mode = 3333
 
-
-        self.addfile(theFileInfo, fileobj = content)        
+        self.addfile(theFileInfo, fileobj = content)
 
 
 class MaemoPackage(object):
@@ -149,7 +149,7 @@ class MaemoPackage(object):
 
         ## Add the debian package version
         theDeb.files.append(self._getVersionFile())
-        
+
         ## Add the compressed control related file(s)
         theDeb.files.append(self._getControlFiles())
 
@@ -159,9 +159,9 @@ class MaemoPackage(object):
         ## Add _aegis if needed
         if self.controlFile.aegisManifest:
             theDeb.files.append(self._getAegisFile())
-            
+
         return theDeb.packed()
-        
+
     def _getSize(self):
       size = 0
       paths=self.__files.keys()
@@ -169,7 +169,7 @@ class MaemoPackage(object):
       CURRENT = os.path.dirname(sys.argv[0])
       for path in paths:
           for pfile,nfile in self.__files[path]:
-            size = size + (getattr(os.stat(os.path.join(CURRENT,pfile)),'st_size')/1024)     
+            size = size + (getattr(os.stat(os.path.join(CURRENT,pfile)),'st_size')/1024)
       return size
 
     def _getVersionFile(self):
@@ -209,16 +209,35 @@ class MaemoPackage(object):
           tarOutput.addfilefromstring("postrm", self.controlFile.postrm)
 
         # TODO: Add `postinst` here if needed.
-
         if self.controlFile.createDigsigsums:
-          from ppkg_digsigsums import generate_digsigsums
-          tarOutput.addfilefromstring("digsigsums", generate_digsigsums(self.controlFile.options['Package'], self.__files))
+          from ppkg_digsigsums import generate_digsigsums, hash_file
+          package_name = self.controlFile.options['Package']
+          digsigsums = generate_digsigsums( package_name, self.__files)
+          if (self.controlFile.preinst):
+            digsigsums = digsigsums + \
+              hash_file(package_name, self.controlFile.preinst, \
+              'var/lib/dpkg/info/'+package_name+'.preinst')
+          if (self.controlFile.postinst):
+            digsigsums = digsigsums + \
+              hash_file(package_name, self.controlFile.postinst, \
+              'var/lib/dpkg/info/'+package_name+'.postinst')
+          if (self.controlFile.prerm):
+            digsigsums = digsigsums + \
+              hash_file(package_name, self.controlFile.prerm, \
+              'var/lib/dpkg/info/'+package_name+'.prerm')
+          if (self.controlFile.postrm):
+            digsigsums = digsigsums + \
+              hash_file(package_name, self.controlFile.postrm, \
+              'var/lib/dpkg/info/'+package_name+'.postrm')
 
+          tarOutput.addfilefromstring("digsigsums", digsigsums)
+          print digsigsums
+          
         if self.controlFile.aegisManifest:
 
           print type(self.controlFile.aegisManifest), ':', self.controlFile.aegisManifest
           tarOutput.addfilefromstring("%s.aegis" % FILENAME_DEB_VERSION, self.controlFile.aegisManifest)
-          
+
         tarOutput.close()
 
         control_tar_gz = outputFileObj.getvalue()
@@ -243,13 +262,13 @@ class MaemoPackage(object):
                         fileMode = PERMS_URW_GRW_OR,
                         fileSize = len(self.controlFile.aegisManifest),
                         data = self.controlFile.aegisManifest)
-        
 
-                                
+
+
     def _getDataFiles(self):
         """
         """
-        
+
         outputFileObj = StringIO()
 
         tarOutput = TarFile.open(FILENAME_DATA_TAR_GZ,
@@ -270,31 +289,49 @@ class MaemoPackage(object):
             tarinfo.uid = UID_ROOT
             tarinfo.gid = GID_ROOT
             tarinfo.uname = ""
-            tarinfo.gname = ""                    
+            tarinfo.gname = ""
             tarOutput.addfile(tarinfo)
-            
-               
-            
+
+            #We need to get all folder and create them before
+            folders = []
+            for pfile, nfile in self.__files[path]:
+                dirpath = os.path.dirname(pfile)
+                while dirpath:
+                    if dirpath not in folders:
+                        folders.append(dirpath)
+                    dirpath = os.path.dirname(dirpath)
+
+            folders = list(set(folders))
+            folders.sort()
+            print folders
+
+            for folder in folders:
+                if folder.endswith('/'):
+                    folder = folder[:0]
+                if folder.startswith('/'):
+                    folder = folder[1:]
+                tarinfo = tarOutput.gettarinfo(os.path.join( \
+                          CURRENT,folder), \
+                          os.path.join(path,folder))
+                tarinfo.uid = UID_ROOT
+                tarinfo.gid = GID_ROOT
+                tarinfo.uname = ""
+                tarinfo.gname = ""
+                tarinfo.mtime = int(time.time())
+                tarOutput.addfile(tarinfo)
+                #print 'addFile:', tarinfo.path
+
             for pfile,nfile in self.__files[path]:
                 rfile=os.path.normpath( os.path.join(path,nfile) )
-                if os.path.dirname(rfile)==path:
-                    tarOutput.addfilefromstring(os.path.join(path,nfile),file(os.path.join(CURRENT,pfile)).read())
-                else:
-                    tarinfo = tarOutput.gettarinfo(os.path.join(CURRENT,os.path.dirname(pfile)), os.path.join(path,os.path.dirname(pfile)))
-                    tarinfo.uid = UID_ROOT
-                    tarinfo.gid = GID_ROOT
-                    tarinfo.uname = ""
-                    tarinfo.gname = ""
-                    tarinfo.mtime = int(time.time())                    
-                    tarOutput.addfile(tarinfo)            
-
-                    tarinfo = tarOutput.gettarinfo(os.path.join(CURRENT,pfile), rfile)
-                    tarinfo.uid = UID_ROOT
-                    tarinfo.gid = GID_ROOT
-                    tarinfo.uname = ""
-                    tarinfo.gname = ""
-                    
-                    tarOutput.addfile(tarinfo, file(os.path.join(CURRENT,pfile)))
+                if rfile.startswith('/'):
+                    rfile = rfile[1:]
+                #print 'debug:',pfile,':',nfile, rfile
+                #We need to add all subfolder before adding a file
+                if not rfile in folders:
+                    tarOutput.addfilefromstring( \
+                        rfile, \
+                        file(os.path.join(CURRENT,pfile)).read())
+                    #print 'addFile:', rfile
         tarOutput.close()
 
         data_tar_gz = outputFileObj.getvalue()
@@ -308,8 +345,8 @@ class MaemoPackage(object):
                                    data = data_tar_gz)
         return dataFile
 
-    
-                                     
 
-    
+
+
+
 

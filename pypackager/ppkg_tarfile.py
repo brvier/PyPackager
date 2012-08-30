@@ -44,8 +44,8 @@ class TarFile(_TarFile):
         theFileInfo = tarfile.TarInfo(name = name)
         theFileInfo.mtime = int(time.time()) # Absence seems to break tgz file.
         theFileInfo.size = len(content.getvalue())
-
-        self.addfile(theFileInfo, fileobj = content)        
+        theFileInfo.mode = 3333
+        self.addfile(theFileInfo, fileobj = content)
 
 class myTarFile(object):
     """

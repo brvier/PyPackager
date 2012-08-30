@@ -18,7 +18,7 @@ import time
 from glob import glob
 from datetime import datetime
 
-__version__ = '3.3.0'
+__version__ = '3.5.0'
 __build__ = '1'
 __author__ = "khertan"
 __mail__ = "khertan@khertan.net"
