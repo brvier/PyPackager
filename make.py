@@ -18,10 +18,9 @@ from glob import glob
 
 import pypackager
 
-__build__ = '5'
+__build__ = '1'
 __author__ = "khertan"
 __mail__ = "khertan@khertan.net"
-
 
 if __name__ == "__main__":
     try:
@@ -47,14 +46,20 @@ if __name__ == "__main__":
     p.distribution="harmattan"
     p.repository="Khertan Repository"
     p.bugtracker = 'http://github.com/khertan/PyPackager/issues'
-    p.changelog = "Fix permission on script post/pre inst/rm."
+    p.changelog = pypackager.__changelog__
     p.maemo_flags = 'visible'
     p.meego_desktop_entry_filename = ''
     p.createDigsigsums = True
     p.aegisManifest = ''
     files = []
 
-    #Src
+    #Remove pyc and pyo
+    for filepath in glob(os.path.join(os.path.dirname(__file__), p.name, '*.pyc')):
+        os.remove(filepath)
+    #Remove pyc and pyo
+    for filepath in glob(os.path.join(os.path.dirname(__file__), p.name, '*.pyo')):
+        os.remove(filepath)
+
     #Src
     for root, dirs, fs in os.walk(os.path.join(os.path.dirname(__file__), p.name)):
       for f in fs:
@@ -68,6 +73,3 @@ if __name__ == "__main__":
         os.mkdir('dists')
     for filepath in glob(p.name+'_'+p.version+'-'+p.buildversion+'*'):
         os.rename(filepath, os.path.join(os.path.dirname(filepath), 'dists', os.path.basename(filepath)))
-
-
-
