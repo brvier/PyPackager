@@ -18,7 +18,7 @@
 #
 # Nick Vargish
 #
-# Simple md5 hash utility for generating md5 checksums of files. 
+# Simple md5 hash utility for generating md5 checksums of files.
 #
 # usage: md5hash <filename> [..]
 #
@@ -26,6 +26,7 @@
 
 import md5
 import sys
+
 
 def sumfile(fobj):
     '''Returns an md5 hash for an object with read() method.'''
@@ -56,4 +57,3 @@ def md5sum(fname):
 if __name__ == '__main__':
     for fname in sys.argv[1:]:
         print '%32s  %s' % (md5sum(fname), fname)
- 	 	

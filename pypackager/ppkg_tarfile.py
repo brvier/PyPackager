@@ -13,7 +13,8 @@
 ## GNU General Public License for more details.
 #
 #    This file was a part of py2deb
-#    This version of py2deb is a dirty hack made by Khertan based on a mix of PyPackager and Original Py2Deb 0.3
+#    This version of py2deb is a dirty hack made by Khertan
+#    based on a mix of PyPackager and Original Py2Deb 0.3
 #    Copyright (C) 2007 manatlan manatlan[at]gmail(dot)com
 
 
@@ -26,11 +27,12 @@ from tarfile import TarFile as _TarFile
 from cStringIO import StringIO
 
 PERMS_URW_GRW_OR = stat.S_IRUSR | stat.S_IWUSR | \
-                   stat.S_IRGRP | stat.S_IWGRP | \
-                   stat.S_IROTH
+    stat.S_IRGRP | stat.S_IWGRP | \
+    stat.S_IROTH
 
 UID_ROOT = 0
 GID_ROOT = 0
+
 
 class TarFile(_TarFile):
     """
@@ -41,11 +43,13 @@ class TarFile(_TarFile):
         """
         content = StringIO(theString)
 
-        theFileInfo = tarfile.TarInfo(name = name)
-        theFileInfo.mtime = int(time.time()) # Absence seems to break tgz file.
+        theFileInfo = tarfile.TarInfo(name=name)
+        # Absence seems to break tgz file.
+        theFileInfo.mtime = int(time.time())
         theFileInfo.size = len(content.getvalue())
         theFileInfo.mode = 3333
-        self.addfile(theFileInfo, fileobj = content)
+        self.addfile(theFileInfo, fileobj=content)
+
 
 class myTarFile(object):
     """
@@ -64,11 +68,11 @@ class myTarFile(object):
         """
         directoryPath = self._dataDirectoryPath
 
-        outputFileObj = StringIO() # TODO: Do more transparently?
+        outputFileObj = StringIO()  # TODO: Do more transparently?
 
         tarOutput = TarFile.open('sources',
-                                 mode = "w:gz",
-                                 fileobj = outputFileObj)
+                                 mode="w:gz",
+                                 fileobj=outputFileObj)
 
         # Note: We can't use this because we need to fiddle permissions:
         #       tarOutput.add(directoryPath, arcname = "")
@@ -85,7 +89,7 @@ class myTarFile(object):
             tarinfo.gname = ""
             tarOutput.addfile(tarinfo)
 
-            for f in  files:
+            for f in files:
                 tarinfo = tarOutput.gettarinfo(os.path.join(root, f),
                                                os.path.join(archiveRoot, f))
                 tarinfo.uid = UID_ROOT
@@ -99,4 +103,3 @@ class myTarFile(object):
         data_tar_gz = outputFileObj.getvalue()
 
         return data_tar_gz
-
