@@ -30,12 +30,12 @@ install it with the application Manager.
 
 ## Prerequisites
 
-Create a folder /myapp under your home folder (e.g. ”/home/user/myapp”). Then
+Create a folder /myapp under your home folder (e.g. ï¿½/home/user/myappï¿½). Then
 add the following files and folders: * A subfolder /src that contains all your
 source files in a folder structure which represents the way your app files
 will install on the device - and with the correct permissions set (so do not
 use the fat partition ~/MyDocs)! * The icon for your software package (e.g.
-myapp.png, 48×48 pixels), the one that will be visible for your package in the
+myapp.png, 48ï¿½48 pixels), the one that will be visible for your package in the
 application manager. * And the make.py file
 
 ## programs and libraries with distutils
@@ -137,19 +137,19 @@ to your needs:
     ##
     import pypackager
     import os
-     
+    ï¿½
     if __name__ == "__main__":
         try:
             os.chdir(os.path.dirname(sys.argv[0]))
         except:
             pass
-     
+    ï¿½
         p=pypackager.PyPackager("khteditor")
         p.version='0.0.1'
         p.buildversion='1'
         p.display_name='KhtEditor'
         p.description="KhtEditor is a source code editor specially designed for devices running Maemo and Meego Handset."
-        p.author="Benoît HERVIER"
+        p.author="Benoï¿½t HERVIER"
         p.maintainer="Khertan"
         p.email="khertan@khertan.net"
         p.depends = "python2.5-qt4-gui,python2.5-qt4-core, python2.5-qt4-maemo5"
@@ -178,7 +178,7 @@ to your needs:
           <docstring></docstring>
         </aegis>'''
         files = []
-     
+    ï¿½
         #Src
         for root, dirs, fs in os.walk('/home/user/MyDocs/Projects/khteditor/khteditor'):
           for f in fs:
@@ -188,25 +188,25 @@ to your needs:
                 prefix = prefix + os.path.basename(root) + '/'
             files.append(prefix+os.path.basename(f))
         print files
-     
-     
+    ï¿½
+    ï¿½
         p["/usr/lib/python2.5/site-packages"] = files
-     
+    ï¿½
         p.postinst = """#!/bin/sh
     chmod +x /usr/bin/khteditor_launch.py
     python -m compileall /usr/lib/python2.5/site-packages/khteditor"""
-     
+    ï¿½
         p.changelog="""First Release
     """
-     
+    ï¿½
     print p.generate(build_binary=False,build_src=True)
     #print p.generate(build_binary=True,build_src=True)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Run your make.py code
 
-Open “X Terminal” on your device and change directory into your folder (e.g.
-“cd /home/user/myapp”). Then run your code using “python2.5 make.py” in Xterm.
+Open ï¿½X Terminalï¿½ on your device and change directory into your folder (e.g.
+ï¿½cd /home/user/myappï¿½). Then run your code using ï¿½python2.5 make.pyï¿½ in Xterm.
 PyPackager will now package your files. Once this is done successfully,
 depending on build option your ~/myapp folder will contain new files ready to
 be uploaded to Maemo Auto Builder or ready to be upload to your own repository
