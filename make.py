@@ -18,7 +18,7 @@ from glob import glob
 
 import pypackager
 
-__build__ = '1'
+__build__ = '2'
 __author__ = "khertan"
 __mail__ = "khertan@khertan.net"
 

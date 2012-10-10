@@ -77,25 +77,26 @@ Requires: %(depends)s
 
 %%install
 %(specrules)s
-"""
-if self.options['postinst']:
-    content = content + """
+""" % self.options
+        if self.options['postinst']:
+            content = content + """
 %%post
 %(postinst)s
-"""
-if self.options['postrm']:
-    content = content + """%%postun
+""" % self.options
+        if self.options['postrm']:
+            content = content + """%%postun
 %(postrm)s
-"""
-if self.options['prerm']:
-    content = content + """%%preun
+""" % self.options
+        if self.options['prerm']:
+            content = content + """%%preun
 %(prerm)s
-"""
-if self.options['preinst']:
-    content = content + """%%pre
+""" % self.options
+        if self.options['preinst']:
+            content = content + """%%pre
 %(preinst)s
+"""
 
-%%clean
+        content = content + """%%clean
 rm -rf %%{buildroot}
 
 

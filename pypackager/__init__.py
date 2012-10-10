@@ -20,12 +20,13 @@ import time
 from glob import glob
 from datetime import datetime
 
-__version__ = '3.7.0'
+__version__ = '3.7.1'
 __build__ = '1'
 __author__ = "khertan"
 __mail__ = "khertan@khertan.net"
 __changelog__ = '''* 3.6.0: Fix permission on script post/pre inst/rm."
 * 3.7.0 : Add experimental specfile creation
+* 3.7.1 : fix incorrect generation of the spec file
 '''
 
 
@@ -256,7 +257,7 @@ FILES :
             pass
         dsccontent = DscFile("%(version)s-%(buildversion)s" % self.__dict__,
                              "%(depends)s" % self.__dict__,
-                             ("%(name)s_%(version)s-"
+                             ("%(name)s_%(version)s-" \
                              "%(buildversion)s_%(arch)s.deb"
                              % self.__dict__,),
                              Format='1.0',
@@ -713,7 +714,7 @@ binary: binary-indep binary-arch
             dsccontent = DscFile('%(version)s-%(buildversion)s'
                                  % self.__dict__,
                                  self.build_depends,
-                                 ('%(TEMP)s/%(name)s_%(version)s""'
+                                 ('%(TEMP)s/%(name)s_%(version)s'
                                  '-%(buildversion)s.tar.gz'
                                  % self.__dict__, ),
                                  Format='1.0',
