@@ -28,102 +28,48 @@ __changelog__ = '''* 3.6.0: Fix permission on script post/pre inst/rm."
 * 3.7.0 : Add experimental specfile creation
 '''
 
-
-class PyPackagerException(Exception):
-    pass
-
+class PyPackagerException(Exception): pass
 
 class PyPackager(object):
 
-    SECTIONS = "user/desktop, user/development, user/education," \
-               " user/games, user/graphics, user/multimedia," \
-               " user/navigation, user/network, user/office," \
-               " user/science, user/system, user/utilities," \
-               " accessories, communication, games, multimedia," \
-               " office, other, programming, support, themes," \
-               " tools".split(", ")
-    ARCHS = "all any armel i386 ia64 alpha amd64 armeb arm hppa" \
-            " m32r m68k mips mipsel powerpc ppc64 s390 s390x sh3" \
-            " sh3eb sh4 sh4eb sparc darwin-i386 darwin-ia64" \
-            " darwin-alpha darwin-amd64 darwin-armeb darwin-arm" \
-            " darwin-hppa darwin-m32r darwin-m68k darwin-mips" \
-            " darwin-mipsel darwin-powerpc darwin-ppc64 darwin-s390" \
-            " darwin-s390x darwin-sh3 darwin-sh3eb darwin-sh4" \
-            " darwin-sh4eb darwin-sparc freebsd-i386 freebsd-ia64" \
-            " freebsd-alpha freebsd-amd64 freebsd-armeb freebsd-arm" \
-            " freebsd-hppa freebsd-m32r freebsd-m68k freebsd-mips" \
-            " freebsd-mipsel freebsd-powerpc freebsd-ppc64 freebsd-s390" \
-            " freebsd-s390x freebsd-sh3 freebsd-sh3eb freebsd-sh4" \
-            " freebsd-sh4eb freebsd-sparc kfreebsd-i386 kfreebsd-ia64" \
-            " kfreebsd-alpha kfreebsd-amd64 kfreebsd-armeb kfreebsd-arm" \
-            " kfreebsd-hppa kfreebsd-m32r kfreebsd-m68k kfreebsd-mips" \
-            " kfreebsd-mipsel kfreebsd-powerpc kfreebsd-ppc64" \
-            " kfreebsd-s390 kfreebsd-s390x kfreebsd-sh3 kfreebsd-sh3eb" \
-            " kfreebsd-sh4 kfreebsd-sh4eb kfreebsd-sparc knetbsd-i386" \
-            " knetbsd-ia64 knetbsd-alpha knetbsd-amd64 knetbsd-armeb" \
-            " knetbsd-arm knetbsd-hppa knetbsd-m32r knetbsd-m68k" \
-            " knetbsd-mips knetbsd-mipsel knetbsd-powerpc knetbsd-ppc64" \
-            " knetbsd-s390 knetbsd-s390x knetbsd-sh3 knetbsd-sh3eb" \
-            " knetbsd-sh4 knetbsd-sh4eb knetbsd-sparc netbsd-i386" \
-            " netbsd-ia64 netbsd-alpha netbsd-amd64 netbsd-armeb" \
-            " netbsd-arm netbsd-hppa netbsd-m32r netbsd-m68k netbsd-mips" \
-            " netbsd-mipsel netbsd-powerpc netbsd-ppc64 netbsd-s390" \
-            " netbsd-s390x netbsd-sh3 netbsd-sh3eb netbsd-sh4 netbsd-sh4eb" \
-            " netbsd-sparc openbsd-i386 openbsd-ia64 openbsd-alpha" \
-            " openbsd-amd64 openbsd-armeb openbsd-arm openbsd-hppa" \
-            " openbsd-m32r openbsd-m68k openbsd-mips openbsd-mipsel" \
-            " openbsd-powerpc openbsd-ppc64 openbsd-s390 openbsd-s390x" \
-            " openbsd-sh3 openbsd-sh3eb openbsd-sh4 openbsd-sh4eb" \
-            " openbsd-sparc hurd-i386 hurd-ia64 hurd-alpha hurd-amd64" \
-            " hurd-armeb hurd-arm hurd-hppa hurd-m32r hurd-m68k hurd-mips" \
-            " hurd-mipsel hurd-powerpc hurd-ppc64 hurd-s390 hurd-s390x" \
-            " hurd-sh3 hurd-sh3eb hurd-sh4 hurd-sh4eb hurd-sparc".split(" ")
-    LICENSES = ["gpl", "lgpl", "bsd", "artistic", "shareware"]
+    SECTIONS="user/desktop, user/development, user/education, user/games, user/graphics, user/multimedia, user/navigation, user/network, user/office, user/science, user/system, user/utilities, accessories, communication, games, multimedia, office, other, programming, support, themes, tools".split(", ")
+    ARCHS="all any armel i386 ia64 alpha amd64 armeb arm hppa m32r m68k mips mipsel powerpc ppc64 s390 s390x sh3 sh3eb sh4 sh4eb sparc darwin-i386 darwin-ia64 darwin-alpha darwin-amd64 darwin-armeb darwin-arm darwin-hppa darwin-m32r darwin-m68k darwin-mips darwin-mipsel darwin-powerpc darwin-ppc64 darwin-s390 darwin-s390x darwin-sh3 darwin-sh3eb darwin-sh4 darwin-sh4eb darwin-sparc freebsd-i386 freebsd-ia64 freebsd-alpha freebsd-amd64 freebsd-armeb freebsd-arm freebsd-hppa freebsd-m32r freebsd-m68k freebsd-mips freebsd-mipsel freebsd-powerpc freebsd-ppc64 freebsd-s390 freebsd-s390x freebsd-sh3 freebsd-sh3eb freebsd-sh4 freebsd-sh4eb freebsd-sparc kfreebsd-i386 kfreebsd-ia64 kfreebsd-alpha kfreebsd-amd64 kfreebsd-armeb kfreebsd-arm kfreebsd-hppa kfreebsd-m32r kfreebsd-m68k kfreebsd-mips kfreebsd-mipsel kfreebsd-powerpc kfreebsd-ppc64 kfreebsd-s390 kfreebsd-s390x kfreebsd-sh3 kfreebsd-sh3eb kfreebsd-sh4 kfreebsd-sh4eb kfreebsd-sparc knetbsd-i386 knetbsd-ia64 knetbsd-alpha knetbsd-amd64 knetbsd-armeb knetbsd-arm knetbsd-hppa knetbsd-m32r knetbsd-m68k knetbsd-mips knetbsd-mipsel knetbsd-powerpc knetbsd-ppc64 knetbsd-s390 knetbsd-s390x knetbsd-sh3 knetbsd-sh3eb knetbsd-sh4 knetbsd-sh4eb knetbsd-sparc netbsd-i386 netbsd-ia64 netbsd-alpha netbsd-amd64 netbsd-armeb netbsd-arm netbsd-hppa netbsd-m32r netbsd-m68k netbsd-mips netbsd-mipsel netbsd-powerpc netbsd-ppc64 netbsd-s390 netbsd-s390x netbsd-sh3 netbsd-sh3eb netbsd-sh4 netbsd-sh4eb netbsd-sparc openbsd-i386 openbsd-ia64 openbsd-alpha openbsd-amd64 openbsd-armeb openbsd-arm openbsd-hppa openbsd-m32r openbsd-m68k openbsd-mips openbsd-mipsel openbsd-powerpc openbsd-ppc64 openbsd-s390 openbsd-s390x openbsd-sh3 openbsd-sh3eb openbsd-sh4 openbsd-sh4eb openbsd-sparc hurd-i386 hurd-ia64 hurd-alpha hurd-amd64 hurd-armeb hurd-arm hurd-hppa hurd-m32r hurd-m68k hurd-mips hurd-mipsel hurd-powerpc hurd-ppc64 hurd-s390 hurd-s390x hurd-sh3 hurd-sh3eb hurd-sh4 hurd-sh4eb hurd-sparc".split(" ")
+    LICENSES=["gpl","lgpl","bsd","artistic","shareware"]
 
-    def __setitem__(self, path, files):
-        if not type(files) == list:
-            raise PyPackagerException(
-                "value of key path '%s' is not a list" % path)
+    def __setitem__(self,path,files):
+        if not type(files)==list:
+            raise PyPackagerException("value of key path '%s' is not a list"%path)
         if not files:
-            raise PyPackagerException(
-                "value of key path '%s' should'nt be empty" % path)
+            raise PyPackagerException("value of key path '%s' should'nt be empty"%path)
         if not path.startswith("/"):
-            raise PyPackagerException(
-                "key path '%s' malformed (don't start with '/')" % path)
+            raise PyPackagerException("key path '%s' malformed (don't start with '/')"%path)
         if path.endswith("/"):
-            raise PyPackagerException(
-                "key path '%s' malformed (shouldn't ends with '/')" % path)
-        nfiles = []
+            raise PyPackagerException("key path '%s' malformed (shouldn't ends with '/')"%path)
+        nfiles=[]
         for file in files:
             if ".." in file:
-                raise PyPackagerException(
-                    "file '%s' contains '..', please avoid that!" % file)
+                raise PyPackagerException("file '%s' contains '..', please avoid that!"%file)
             if "|" in file:
-                if file.count("|") != 1:
-                    raise PyPackagerException(
-                        "file '%s' is incorrect (more than one pipe)" % file)
-                file, nfile = file.split("|")
+                if file.count("|")!=1:
+                    raise PyPackagerException("file '%s' is incorrect (more than one pipe)"%file)
+                file,nfile = file.split("|")
             else:
-                nfile = file  # same localisation
+                nfile=file  # same localisation
             if os.path.isdir(file):
-                raise PyPackagerException(
-                    "file '%s' is a folder,"
-                    " and py2deb refuse folders !" % file)
+                raise PyPackagerException("file '%s' is a folder, and py2deb refuse folders !"%file)
             if not os.path.isfile(file):
-                raise PyPackagerException("file '%s' doesn't exist" % file)
+                raise PyPackagerException("file '%s' doesn't exist"%file)
             if file.startswith("/"):    # if an absolute file is defined
-                if file == nfile:         # and not renamed (pipe trick)
-                    # it's simply copied to path
-                    nfile = os.path.basename(file)
-            nfiles.append((file, nfile))
-        #sort according new name (nfile)
-        nfiles.sort(lambda a, b: cmp(a[1], b[1]))
-        self.__files[path] = nfiles
+                if file==nfile:         # and not renamed (pipe trick)
+                    nfile=os.path.basename(file)   # it's simply copied to 'path'
+            nfiles.append( (file,nfile) )
+        nfiles.sort( lambda a,b :cmp(a[1],b[1]))    #sort according new name (nfile)
+        self.__files[path]=nfiles
 
-    def __delitem__(self, k):
+    def __delitem__(self,k):
         del self.__files[k]
 
-    def __init__(self, name):
+    def __init__(self,name):
         self.name = name
         self.display_name = name
         self.description = "No description"
@@ -161,26 +107,25 @@ class PyPackager(object):
         self.aegisManifest = ''
 
     def __repr__(self):
-        paths = self.__files.keys()
+        paths=self.__files.keys()
         paths.sort()
-        files = []
+        files=[]
         for path in paths:
-            for file, nfile in self.__files[path]:
-                rfile = os.path.join(path, nfile)
-                if nfile == file:
-                    files.append(rfile)
+            for file,nfile in self.__files[path]:
+                rfile=os.path.join(path,nfile)
+                if nfile==file:
+                    files.append( rfile )
                 else:
-                    files.append(rfile + " (%s)" % file)
+                    files.append( rfile + " (%s)"%file)
         files.sort()
         self.files = "\n".join(files)
 
-        lscripts = [self.preinst and "preinst",
-                    self.postinst and "postinst",
-                    self.prerm and "prerm",
-                    self.postrm and "postrm", ]
-
-        self.scripts = lscripts and \
-            ", ".join([i for i in lscripts if i]) or "None"
+        lscripts = [    self.preinst and "preinst",
+                        self.postinst and "postinst",
+                        self.prerm  and "prerm",
+                        self.postrm and "postrm",
+                    ]
+        self.scripts = lscripts and ", ".join([i for i in lscripts if i]) or "None"
         return """
 ----------------------------------------------------------------------
 NAME        : %(name)s
@@ -203,7 +148,7 @@ FILES :
 %(files)s
 """ % self.__dict__
 
-    def generate(self, build_binary=False, build_src=True):
+    def generate(self,build_binary=False,build_src=True):
         if build_binary:
             self.generate_binary()
         if build_src:
@@ -213,90 +158,77 @@ FILES :
         from ppkg_debfile import MaemoPackage, ControlFile
         import base64
         try:
-            iconb64 = "".join(base64.encodestring(
-                open(self.icon).read()).split("\n")[0:-1])
+            iconb64 = "".join(base64.encodestring(open(self.icon).read()).split("\n")[0:-1])
         except:
-            iconb64 = ''
+            iconb64= ''
 
         theMaemoPackage = MaemoPackage(
-            ControlFile(Icon=str(iconb64),
-                        BugTracker=self.bugtracker,
-                        DisplayName=self.display_name,
-                        PreInst=self.preinst,
-                        PostInst=self.postinst,
-                        PreRm=self.prerm,
-                        PostRm=self.postrm,
-                        Package=self.name,
-                        Version=self.version + '-' + self.buildversion,
-                        Section=self.section,
-                        Priority='low',
-                        Architecture=self.arch,
-                        Maintainer=self.maintainer,
-                        Depends=self.depends,
-                        Suggest=self.suggests,
-                        Description=self.description,
-                        UpgradeDescription=self.upgrade_description,
-                        MaemoFlags=self.maemo_flags,
-                        MeegoDesktopEntryFilename=
-                        self.meego_desktop_entry_filename,
-                        createDigsigsums=self.createDigsigsums,
-                        aegisManifest=self.aegisManifest),
-            self.__files)
+          ControlFile(Icon=str(iconb64),
+          BugTracker=self.bugtracker,
+          DisplayName=self.display_name,
+          PreInst=self.preinst,
+          PostInst=self.postinst,
+          PreRm=self.prerm,
+          PostRm=self.postrm,
+          Package=self.name,
+          Version=self.version+'-'+self.buildversion,
+          Section=self.section,
+          Priority='low',
+          Architecture=self.arch,
+          Maintainer=self.maintainer,
+          Depends=self.depends,
+          Suggest=self.suggests,
+          Description=self.description,
+          UpgradeDescription=self.upgrade_description,
+          MaemoFlags=self.maemo_flags,
+          MeegoDesktopEntryFilename=self.meego_desktop_entry_filename,
+          createDigsigsums=self.createDigsigsums,
+          aegisManifest = self.aegisManifest),
+          self.__files)
 
-        open(self.name + '_' + self.version + '-' +
-             self.buildversion + '_' + self.arch + '.deb', "wb") \
-            .write(theMaemoPackage.packed())
+        open(self.name+'_'+self.version+'-'+self.buildversion+'_'+self.arch+ '.deb',"wb").write(theMaemoPackage.packed())
 
         #Dsc
         from ppkg_dscfile import DscFile
         import locale
         try:
-            old_locale, iso = locale.getlocale(locale.LC_TIME)
-            locale.setlocale(locale.LC_TIME, 'en_US')
+            old_locale,iso=locale.getlocale(locale.LC_TIME)
+            locale.setlocale(locale.LC_TIME,'en_US')
         except:
             pass
-        dsccontent = DscFile("%(version)s-%(buildversion)s" % self.__dict__,
-                             "%(depends)s" % self.__dict__,
-                             ("%(name)s_%(version)s-"
-                             "%(buildversion)s_%(arch)s.deb"
-                             % self.__dict__, ),
-                             Format='1.0',
-                             Source="%(name)s" % self.__dict__,
-                             Version="%(version)s-%(buildversion)s"
-                             % self.__dict__,
-                             Maintainer="%(maintainer)s <%(email)s>"
-                             % self.__dict__,
-                             Architecture="%(arch)s" % self.__dict__,)
-        f = open("%(name)s_%(version)s-%(buildversion)s.dsc"
-                 % self.__dict__, "wb")
+        dsccontent = DscFile("%(version)s-%(buildversion)s"%self.__dict__,
+                   "%(depends)s"%self.__dict__,
+                   ("%(name)s_%(version)s-%(buildversion)s_%(arch)s.deb"%self.__dict__,),
+                   Format='1.0',
+                   Source="%(name)s"%self.__dict__,
+                   Version="%(version)s-%(buildversion)s"%self.__dict__,
+                   Maintainer="%(maintainer)s <%(email)s>"%self.__dict__,
+                   Architecture="%(arch)s"%self.__dict__,
+                  )
+        f = open("%(name)s_%(version)s-%(buildversion)s.dsc"%self.__dict__,"wb")
         f.write(dsccontent._getContent())
         f.close()
         #Changes
         from ppkg_changesfile import ChangesFile
         changescontent = ChangesFile(
-            "%(author)s <%(email)s>"%self.__dict__,
-            "%(description)s"%self.__dict__,
-            "%(changelog)s"%self.__dict__,
-            (
-              "%(name)s_%(version)s-"
-              "%(buildversion)s_%(arch)s.deb"
-              % self.__dict__,
-              "%(name)s_%(version)s-"
-              "%(buildversion)s.dsc"
-              % self.__dict__,
-            ),
-            "%(section)s"%self.__dict__,
-            "%(repository)s"%self.__dict__,
-            Format='1.7',
-            Date=time.strftime(
-                "%a, %d %b %Y %H:%M:%S +0000", time.gmtime()),
-            Source="%(name)s"%self.__dict__,
-            Architecture="%(arch)s"%self.__dict__,
-            Version="%(version)s-%(buildversion)s"%self.__dict__,
-            Distribution="%(distribution)s"%self.__dict__,
-            Urgency="%(urgency)s"%self.__dict__,
-            Maintainer="%(maintainer)s <%(email)s>"%self.__dict__
-            )
+                        "%(author)s <%(email)s>"%self.__dict__,
+                        "%(description)s"%self.__dict__,
+                        "%(changelog)s"%self.__dict__,
+                        (
+                               "%(name)s_%(version)s-%(buildversion)s_%(arch)s.deb"%self.__dict__,
+                               "%(name)s_%(version)s-%(buildversion)s.dsc"%self.__dict__,
+                        ),
+                        "%(section)s"%self.__dict__,
+                        "%(repository)s"%self.__dict__,
+                        Format='1.7',
+                        Date=time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime()),
+                        Source="%(name)s"%self.__dict__,
+                        Architecture="%(arch)s"%self.__dict__,
+                        Version="%(version)s-%(buildversion)s"%self.__dict__,
+                        Distribution="%(distribution)s"%self.__dict__,
+                        Urgency="%(urgency)s"%self.__dict__,
+                        Maintainer="%(maintainer)s <%(email)s>"%self.__dict__
+                        )
         f = open("%(name)s_%(version)s-%(buildversion)s.changes"%self.__dict__,"wb")
         f.write(changescontent.getContent())
         f.close()
