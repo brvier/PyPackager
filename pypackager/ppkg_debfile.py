@@ -105,7 +105,7 @@ class ControlFile(object):
 
         if self.upgrade_description:
             self.upgrade_description = \
-                self.upgrade_description.replace("\n", "\n ")
+                self.upgrade_description.rstrip('\n').replace("\n", "\n ")
             content.append("Maemo-Upgrade-Description: %s"
                            % self.upgrade_description)
 

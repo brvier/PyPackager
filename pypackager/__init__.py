@@ -20,14 +20,15 @@ import time
 from glob import glob
 from datetime import datetime
 
-__version__ = '3.7.1'
-__build__ = '1'
+__version__ = '3.7.3'
+__build__ = '5'
 __author__ = "khertan"
 __mail__ = "khertan@khertan.net"
 __changelog__ = '''* 3.6.0: Fix permission on script post/pre inst/rm."
 * 3.7.0 : Add experimental specfile creation
 * 3.7.1 : fix incorrect generation of the spec file
-'''
+* 3.7.2 : fix error in spec file
+* 3.7.3 : add possibilities to have different dependancies for spec / deb'''
 
 
 class PyPackagerException(Exception):
@@ -128,13 +129,15 @@ class PyPackager(object):
     def __init__(self, name):
         self.name = name
         self.display_name = name
+        self.summary = 'No summary'
         self.description = "No description"
         self.license = "gpl"
         self.depends = "python"
+        self.rpm_depends = None
         self.suggests = ""
         self.section = "user/other"
         self.arch = ""
-        self.url = "http://"
+
         self.author = ""
         self.maintainer = ""
         self.email = ""
@@ -149,6 +152,7 @@ class PyPackager(object):
 
         self.changelog = None
 
+        self.url = "http://"
         self.bugtracker = ""
         self.icon = None
 
@@ -257,7 +261,7 @@ FILES :
             pass
         dsccontent = DscFile("%(version)s-%(buildversion)s" % self.__dict__,
                              "%(depends)s" % self.__dict__,
-                             ("%(name)s_%(version)s-" \
+                             ("%(name)s_%(version)s-"
                              "%(buildversion)s_%(arch)s.deb"
                              % self.__dict__,),
                              Format='1.0',
@@ -769,6 +773,8 @@ binary: binary-indep binary-arch
                     changeslog = changeslog + '- %s\n' % line
             self.changeslog = changeslog
             self.builddepends = 'python-devel'
+            if self.rpm_depends is None:
+                self.rpm_depends = self.depends
             self.sources = "%(TEMP)s/%(name)s_%(version)s-%(buildversion)s.tar.gz" % self.__dict__
             specfile = SpecFile(self.__dict__)
             f = open("%(TEMP)s/%(name)s_%(version)s-%(buildversion)s.spec" % self.__dict__, "wb")

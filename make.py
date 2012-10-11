@@ -18,7 +18,7 @@ from glob import glob
 
 import pypackager
 
-__build__ = '2'
+__build__ = pypackager.__build__
 __author__ = "khertan"
 __mail__ = "khertan@khertan.net"
 
@@ -32,19 +32,21 @@ if __name__ == "__main__":
     p.display_name = 'PyPackager'
     p.version = pypackager.__version__
     p.buildversion = __build__
-    p.description="Generate simple deb or source deb from python"
-    p.upgrade_description="Add support for harmattan"
+    p.summary = 'A python packaging tool : deb, dsc, spec'
+    p.description="Create debian binary package, debian source package, and obs source package (specs) easily from python"
+    p.upgrade_description= pypackager.__changelog__
     p.author=__author__
     p.maintainer=__author__
     p.email=__mail__
     p.depends = "python"
     p.suggests = "khteditor"
     p.section="user/development"
-    p.arch="armel"
+    p.arch="all"
     p.urgency="low"
     p.icon='pypackager.png'
     p.distribution="harmattan"
     p.repository="Khertan Repository"
+    p.url = 'http://khertan.net/PyPackager'
     p.bugtracker = 'http://github.com/khertan/PyPackager/issues'
     p.changelog = pypackager.__changelog__
     p.maemo_flags = 'visible'
@@ -66,6 +68,7 @@ if __name__ == "__main__":
         files.append(os.path.join(root, f))
 
     p["/usr/lib/pymodules/python2.6"] = files
+    p["/usr/lib/pymodules/python2.7"] = files
 
     print p.generate(build_binary=True,build_src=True)
 

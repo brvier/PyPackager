@@ -37,9 +37,11 @@ class SpecFile(object):
                     dst_path = "%{buildroot}" \
                                + os.path.join(path,
                                               os.path.dirname(nfile))
-                    files.append(os.path.join(path, os.path.dirname(nfile)))
-                    rules.append('mkdir -p "%s"' % dst_path)
                     nname = os.path.basename(nfile)
+                    files.append(os.path.join(path,
+                                              os.path.dirname(nfile),
+                                              nname))
+                    rules.append('mkdir -p "%s"' % dst_path)
 
                     # make a line RULES to be sure the destination folder
                     # is created and one for copying the file
@@ -57,13 +59,14 @@ class SpecFile(object):
 Name: %(name)s
 Version: %(version)s
 Release: %(buildversion)s
-Summary: %(description)s
+Summary: %(summary)s
 Group: %(section)s
 License: %(license)s
 URL: %(url)s
 Source0: %(sources)s
-BuildRoot: %%{_tmppath}/%%{name}-%%{version}-%%{release}-root-%%(%%{__id_u} -n)
 
+BuildRoot: %%{_tmppath}/%%{name}-%%{version}-%%{release}-root-%%(%%{__id_u} -n)
+BuildArch: noarch
 BuildRequires: %(builddepends)s
 Requires: %(depends)s
 
