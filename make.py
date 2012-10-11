@@ -55,13 +55,12 @@ if __name__ == "__main__":
     p.aegisManifest = ''
     files = []
 
-    #Remove pyc and pyo
-    for filepath in glob(os.path.join(os.path.dirname(__file__), p.name, '*.pyc')):
-        os.remove(filepath)
-    #Remove pyc and pyo
-    for filepath in glob(os.path.join(os.path.dirname(__file__), p.name, '*.pyo')):
-        os.remove(filepath)
-
+    #Include byte compiled files, so do not remove it at packaging
+    #time : selinux / obs spec packaging can require them
+    from compileall import compile_dir
+    compile_dir(os.path.join(os.path.dirname(__file__), p.name))
+    os.system('python -O -m compileall '+os.path.join(os.path.dirname(__file__), p.name))
+    
     #Src
     for root, dirs, fs in os.walk(os.path.join(os.path.dirname(__file__), p.name)):
       for f in fs:

@@ -21,7 +21,7 @@ from glob import glob
 from datetime import datetime
 
 __version__ = '3.7.3'
-__build__ = '5'
+__build__ = '6'
 __author__ = "khertan"
 __mail__ = "khertan@khertan.net"
 __changelog__ = '''* 3.6.0: Fix permission on script post/pre inst/rm."
