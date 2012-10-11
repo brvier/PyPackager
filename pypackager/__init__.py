@@ -775,6 +775,8 @@ binary: binary-indep binary-arch
             self.builddepends = 'python-devel'
             if self.rpm_depends is None:
                 self.rpm_depends = self.depends
+            else:
+                self.depends = self.rpm_depends
             self.sources = "%(TEMP)s/%(name)s_%(version)s-%(buildversion)s.tar.gz" % self.__dict__
             specfile = SpecFile(self.__dict__)
             f = open("%(TEMP)s/%(name)s_%(version)s-%(buildversion)s.spec" % self.__dict__, "wb")
