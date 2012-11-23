@@ -208,15 +208,35 @@ FILES :
 %(files)s
 """ % self.__dict__
 
-    def generate(self, build_binary=False, build_src=True):
-        if build_binary:
-            self.generate_binary()
-        if build_src:
-            self.generate_source()
+    def _create_dist_folder(self):
+        if not os.path.exists('dists'):
+            os.mkdir('dists')
+        self._dist_dir = os.path.join(os.path.join('dists',
+                                                   self.version
+                                                   + '-'
+                                                   + self.buildversion))
+        if not os.path.exists(self._dist_dir):
+            os.mkdir(self._dist_dir)
 
-    def generate_binary(self):
+    def generate(self, options):
+        self._create_dist_folder()
+
+        if 'debian_binary' in options:
+            self.generate_debian_binary()
+        if 'debian_source' in options:
+            self.generate_debian_source()
+        if 'rpm_source' in options:
+            self.generate_rpm_source()
+
+    def generate_debian_binary(self):
         from ppkg_debfile import MaemoPackage, ControlFile
         import base64
+
+        #Create debian binary dist folder
+        _dist_dir = os.path.join(self._dist_dir, 'debian_binary')
+        if not os.path.exists(_dist_dir):
+            os.mkdir(_dist_dir)
+
         try:
             iconb64 = "".join(base64.encodestring(
                 open(self.icon).read()).split("\n")[0:-1])
@@ -248,8 +268,12 @@ FILES :
                         aegisManifest=self.aegisManifest),
             self.__files)
 
-        open(self.name + '_' + self.version + '-' + self.buildversion
-             + '_' + self.arch + '.deb', "wb").write(theMaemoPackage.packed())
+        open(os.path.join(_dist_dir, self.name
+                          + '_'
+                          + self.version
+                          + '-' + self.buildversion
+                          + '_' + self.arch
+                          + '.deb'), "wb").write(theMaemoPackage.packed())
 
         #Dsc
         from ppkg_dscfile import DscFile
@@ -259,11 +283,14 @@ FILES :
             locale.setlocale(locale.LC_TIME, 'en_US')
         except:
             pass
+            
+        print os.path.join(_dist_dir, "%(name)s_%(version)s-" 
+                             "%(buildversion)s_%(arch)s.deb" % self.__dict__)
         dsccontent = DscFile("%(version)s-%(buildversion)s" % self.__dict__,
                              "%(depends)s" % self.__dict__,
-                             ("%(name)s_%(version)s-"
+                             (os.path.join(_dist_dir, "%(name)s_%(version)s-"
                              "%(buildversion)s_%(arch)s.deb"
-                             % self.__dict__,),
+                             % self.__dict__), ),
                              Format='1.0',
                              Source="%(name)s" % self.__dict__,
                              Version="%(version)s-%(buildversion)s"
@@ -271,20 +298,24 @@ FILES :
                              Maintainer="%(maintainer)s <%(email)s>"
                              % self.__dict__,
                              Architecture="%(arch)s" % self.__dict__,)
-        f = open("%(name)s_%(version)s-%(buildversion)s.dsc"
-                 % self.__dict__, "wb")
+        f = open(os.path.join(_dist_dir,
+                              "%(name)s_%(version)s-%(buildversion)s.dsc"
+                              % self.__dict__), "wb")
         f.write(dsccontent._getContent())
         f.close()
+
         #Changes
         from ppkg_changesfile import ChangesFile
         changescontent = ChangesFile(
             "%(author)s <%(email)s>" % self.__dict__,
             "%(description)s" % self.__dict__,
             "%(changelog)s" % self.__dict__,
-            ("%(name)s_%(version)s-%(buildversion)s_%(arch)s.deb"
-                % self.__dict__,
-                "%(name)s_%(version)s-%(buildversion)s.dsc"
-                % self.__dict__, ),
+            (os.path.join(_dist_dir,
+                          "%(name)s_%(version)s-%(buildversion)s_%(arch)s.deb"
+             % self.__dict__,),
+             os.path.join(_dist_dir,
+                          "%(name)s_%(version)s-%(buildversion)s.dsc"
+             % self.__dict__, ),),
             "%(section)s" % self.__dict__,
             "%(repository)s" % self.__dict__,
             Format='1.7',
@@ -296,8 +327,9 @@ FILES :
             Distribution="%(distribution)s" % self.__dict__,
             Urgency="%(urgency)s" % self.__dict__,
             Maintainer="%(maintainer)s <%(email)s>" % self.__dict__)
-        f = open("%(name)s_%(version)s-%(buildversion)s.changes"
-                 % self.__dict__, "wb")
+        f = open(os.path.join(_dist_dir,
+                              "%(name)s_%(version)s-%(buildversion)s.changes"
+                              % self.__dict__), "wb")
         f.write(changescontent.getContent())
         f.close()
         try:
@@ -305,11 +337,7 @@ FILES :
         except:
             pass
 
-    def generate_source(self):
-        """ generate a deb of version 'version', with or without 'changelog',
-            with or without a rpm (in the current folder)
-            return a list of generated files
-        """
+    def generate_common_source(self, _dist_dir):
         if not sum([len(i) for i in self.__files.values()]) > 0:
             raise PyPackagerException("no files are defined")
 
@@ -707,65 +735,36 @@ binary: binary-indep binary-arch
             tarcontent = myTarFile("%(DEST)s" % locals())
             open("%(TEMP)s/%(name)s_%(version)s-%(buildversion)s.tar.gz"
                  % self.__dict__, "wb").write(tarcontent.packed())
-            #Dsc
-            from ppkg_dscfile import DscFile
+
+            l = glob("%(TEMP)s/%(name)s*.tar.gz" % self.__dict__)
+            if len(l) != 1:
+                raise PyPackagerException("don't find source package tar.gz")
+            tar = os.path.join(_dist_dir, os.path.basename(l[0]))
+            shutil.move(l[0], tar)
+        except:
+            return False
+        return True
+
+    def generate_rpm_source(self):
+        _dist_dir = os.path.join(self._dist_dir, 'rpm_source')
+        if not os.path.exists(_dist_dir):
+            os.mkdir(_dist_dir)
+        if self.generate_common_source(_dist_dir):
+
+            #Specs
+            from ppkg_specfile import SpecFile
             import locale
             try:
                 old_locale, iso = locale.getlocale(locale.LC_TIME)
                 locale.setlocale(locale.LC_TIME, 'en_US')
             except:
                 pass
-            dsccontent = DscFile('%(version)s-%(buildversion)s'
-                                 % self.__dict__,
-                                 self.build_depends,
-                                 ('%(TEMP)s/%(name)s_%(version)s'
-                                 '-%(buildversion)s.tar.gz'
-                                 % self.__dict__, ),
-                                 Format='1.0',
-                                 Source="%(name)s" % self.__dict__,
-                                 Version="%(version)s-%(buildversion)s"
-                                 % self.__dict__,
-                                 Maintainer="%(maintainer)s <%(email)s>"
-                                 % self.__dict__,
-                                 Architecture="%(arch)s" % self.__dict__, )
 
-            f = open("%(TEMP)s/%(name)s_%(version)s-%(buildversion)s.dsc"
-                     % self.__dict__,
-                     "wb")
-            f.write(dsccontent._getContent())
-            f.close()
-
-            #Changes
-            from ppkg_changesfile import ChangesFile
-            changescontent = ChangesFile(
-                "%(author)s <%(email)s>" % self.__dict__,
-                "%(description)s" % self.__dict__,
-                "%(changelog)s" % self.__dict__,
-                (
-                    "%(TEMP)s/%(name)s_%(version)s-%(buildversion)s.tar.gz" % self.__dict__,
-                    "%(TEMP)s/%(name)s_%(version)s-%(buildversion)s.dsc" % self.__dict__,
-                ),
-                "%(section)s" % self.__dict__,
-                "%(repository)s" % self.__dict__,
-                Format='1.7',
-                Date=time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime()),
-                Source="%(name)s" % self.__dict__,
-                Architecture="%(arch)s" % self.__dict__,
-                Version="%(version)s-%(buildversion)s"
-                % self.__dict__,
-                Distribution="%(distribution)s" % self.__dict__,
-                Urgency="%(urgency)s" % self.__dict__,
-                Maintainer="%(maintainer)s <%(email)s>" % self.__dict__)
-            f = open("%(TEMP)s/%(name)s_%(version)s-%(buildversion)s.changes"
-                     % self.__dict__, "wb")
-            f.write(changescontent.getContent())
-            f.close()
-
-            #Specs
-            from ppkg_specfile import SpecFile
             #Specific for rpm
             changeslog = ('* ' + time.strftime("%a %b %d %Y", time.gmtime())
-                          + " %(author)s <%(email)s> - %(version)s-%(buildversion)s\n" % self.__dict__)
+                          + (" %(author)s <%(email)s> - "
+                             "%(version)s-%(buildversion)s\n")
+                          % self.__dict__)
             for index, line in enumerate(self.changelog.split('\n')):
                 if line.startswith('-'):
                     changeslog = changeslog + line + '\n'
@@ -777,9 +776,15 @@ binary: binary-indep binary-arch
                 self.rpm_depends = self.depends
             else:
                 self.depends = self.rpm_depends
-            self.sources = "%(TEMP)s/%(name)s_%(version)s-%(buildversion)s.tar.gz" % self.__dict__
+            self.sources = os.path.join(_dist_dir,
+                                        "%(name)s_%(version)s-"
+                                        "%(buildversion)s.tar.gz"
+                                        % self.__dict__)
             specfile = SpecFile(self.__dict__)
-            f = open("%(TEMP)s/%(name)s_%(version)s-%(buildversion)s.spec" % self.__dict__, "wb")
+            f = open(os.path.join(_dist_dir,
+                                  "%(name)s_%(version)s"
+                                  "-%(buildversion)s.spec"
+                                  % self.__dict__), "wb")
             f.write(specfile.content)
             f.close()
 
@@ -788,36 +793,83 @@ binary: binary-indep binary-arch
             except:
                 pass
 
-            ret = []
-            l = glob("%(TEMP)s/%(name)s*.tar.gz" % self.__dict__)
-            if len(l) != 1:
-                raise PyPackagerException("don't find source package tar.gz")
-            tar = os.path.basename(l[0])
-            shutil.move(l[0], tar)
-            ret.append(tar)
-            l = glob("%(TEMP)s/%(name)s*.dsc" % self.__dict__)
-            if len(l) != 1:
-                raise PyPackagerException("don't find source package dsc")
-            tar = os.path.basename(l[0])
-            shutil.move(l[0], tar)
-            ret.append(tar)
-            l = glob("%(TEMP)s/%(name)s*.changes" % self.__dict__)
-            if len(l) != 1:
-                raise PyPackagerException("don't find source package changes")
-            tar = os.path.basename(l[0])
-            shutil.move(l[0], tar)
-            ret.append(tar)
-            l = glob("%(TEMP)s/%(name)s*.spec" % self.__dict__)
-            if len(l) != 1:
-                raise PyPackagerException("don't find source package spec")
-            tar = os.path.basename(l[0])
-            shutil.move(l[0], tar)
-            ret.append(tar)
+            shutil.rmtree(self.TEMP)
 
-            return ret
+    def generate_debian_source(self):
+        _dist_dir = os.path.join(self._dist_dir, 'debian_source')
+        if not os.path.exists(_dist_dir):
+            os.mkdir(_dist_dir)
+        if self.generate_common_source(_dist_dir):
 
-        finally:
+            #Dsc
+            from ppkg_dscfile import DscFile
+            import locale
+            try:
+                old_locale, iso = locale.getlocale(locale.LC_TIME)
+                locale.setlocale(locale.LC_TIME, 'en_US')
+            except:
+                pass
+            dsccontent = DscFile('%(version)s-%(buildversion)s'
+                                 % self.__dict__,
+                                 self.build_depends,
+                                 (os.path.join(_dist_dir,
+                                               '%(name)s_%(version)s'
+                                               '-%(buildversion)s.tar.gz'
+                                               % self.__dict__, ),),
+                                 Format='1.0',
+                                 Source="%(name)s" % self.__dict__,
+                                 Version="%(version)s-%(buildversion)s"
+                                 % self.__dict__,
+                                 Maintainer="%(maintainer)s <%(email)s>"
+                                 % self.__dict__,
+                                 Architecture="%(arch)s" % self.__dict__, )
+
+            f = open(os.path.join(_dist_dir,
+                                  "%(name)s_%(version)s-%(buildversion)s.dsc"
+                                  % self.__dict__), "wb")
+            f.write(dsccontent._getContent())
+            f.close()
+
+            #Changes
+            from ppkg_changesfile import ChangesFile
+            changescontent = ChangesFile(
+                "%(author)s <%(email)s>" % self.__dict__,
+                "%(description)s" % self.__dict__,
+                "%(changelog)s" % self.__dict__,
+                (
+                    os.path.join(_dist_dir,
+                                 "%(name)s_%(version)s-%(buildversion)s.tar.gz"
+                                 % self.__dict__,),
+                    os.path.join(_dist_dir,
+                                 "%(name)s_%(version)s-%(buildversion)s.dsc"
+                                 % self.__dict__,),
+                ),
+                "%(section)s" % self.__dict__,
+                "%(repository)s" % self.__dict__,
+                Format='1.7',
+                Date=time.strftime("%a, %d %b %Y %H:%M:%S +0000",
+                                   time.gmtime()),
+                Source="%(name)s" % self.__dict__,
+                Architecture="%(arch)s" % self.__dict__,
+                Version="%(version)s-%(buildversion)s"
+                % self.__dict__,
+                Distribution="%(distribution)s" % self.__dict__,
+                Urgency="%(urgency)s" % self.__dict__,
+                Maintainer="%(maintainer)s <%(email)s>" % self.__dict__)
+            f = open(os.path.join(_dist_dir,
+                                  "%(name)s_%(version)s-"
+                                  "%(buildversion)s.changes"
+                                  % self.__dict__), "wb")
+            f.write(changescontent.getContent())
+            f.close()
+
+            try:
+                locale.setlocale(locale.LC_TIME, old_locale)
+            except:
+                pass
+
             shutil.rmtree(self.TEMP)
 
 if __name__ == "__main__":
     print 'Look at make.py in the git repository to see how to use it'
+
