@@ -107,9 +107,6 @@ rm -rf %%{buildroot}
 %%defattr(-,root,root,-)
 %(packedfiles)s
 
-%%changelog
-%(changeslog)s
-
 """ % self.options
         return content
 

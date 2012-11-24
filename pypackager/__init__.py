@@ -20,15 +20,18 @@ import time
 from glob import glob
 from datetime import datetime
 
-__version__ = '3.7.3'
-__build__ = '6'
+__version__ = '4.0.0'
+__build__ = '1'
 __author__ = "khertan"
 __mail__ = "khertan@khertan.net"
 __changelog__ = '''* 3.6.0: Fix permission on script post/pre inst/rm."
 * 3.7.0 : Add experimental specfile creation
 * 3.7.1 : fix incorrect generation of the spec file
 * 3.7.2 : fix error in spec file
-* 3.7.3 : add possibilities to have different dependancies for spec / deb'''
+* 3.7.3 : add possibilities to have different dependancies for spec / deb
+* 4.0.0 : Put builded packages in different sub folder as changes file for
+          debian and rpm source have same name but different structure.
+          Cleaning code'''
 
 
 class PyPackagerException(Exception):
@@ -36,52 +39,6 @@ class PyPackagerException(Exception):
 
 
 class PyPackager(object):
-
-    SECTIONS = "user/desktop, user/development, user/education, user/games," \
-        " user/graphics, user/multimedia, user/navigation," \
-        " user/network," \
-        " user/office, user/science, user/system, user/utilities," \
-        " accessories, communication, games, multimedia, office," \
-        " other, programming, support, themes, tools".split(", ")
-    ARCHS = "all any armel i386 ia64 alpha amd64 armeb arm hppa m32r" \
-            " m68k mips mipsel powerpc ppc64 s390 s390x sh3 sh3eb sh4" \
-            " sh4eb sparc darwin-i386 darwin-ia64 darwin-alpha darwin-amd64" \
-            " darwin-armeb darwin-arm darwin-hppa darwin-m32r darwin-m68k" \
-            " darwin-mips darwin-mipsel darwin-powerpc darwin-ppc64" \
-            " darwin-s390 darwin-s390x darwin-sh3 darwin-sh3eb darwin-sh4" \
-            " darwin-sh4eb darwin-sparc freebsd-i386 freebsd-ia64" \
-            " freebsd-alpha freebsd-amd64 freebsd-armeb freebsd-arm" \
-            " freebsd-hppa freebsd-m32r freebsd-m68k freebsd-mips" \
-            " freebsd-mipsel freebsd-powerpc freebsd-ppc64 freebsd-s390" \
-            " freebsd-s390x freebsd-sh3 freebsd-sh3eb freebsd-sh4" \
-            " freebsd-sh4eb freebsd-sparc kfreebsd-i386 kfreebsd-ia64" \
-            " kfreebsd-alpha kfreebsd-amd64 kfreebsd-armeb" \
-            " kfreebsd-arm kfreebsd-hppa kfreebsd-m32r kfreebsd-m68k" \
-            " kfreebsd-mips kfreebsd-mipsel kfreebsd-powerpc" \
-            " kfreebsd-ppc64 kfreebsd-s390 kfreebsd-s390x kfreebsd-sh3" \
-            " kfreebsd-sh3eb kfreebsd-sh4 kfreebsd-sh4eb kfreebsd-sparc" \
-            " knetbsd-i386 knetbsd-ia64 knetbsd-alpha knetbsd-amd64" \
-            " knetbsd-armeb knetbsd-arm knetbsd-hppa knetbsd-m32r" \
-            " knetbsd-m68k knetbsd-mips knetbsd-mipsel knetbsd-powerpc" \
-            " knetbsd-ppc64 knetbsd-s390 knetbsd-s390x knetbsd-sh3" \
-            " knetbsd-sh3eb knetbsd-sh4 knetbsd-sh4eb knetbsd-sparc" \
-            " netbsd-i386 netbsd-ia64 netbsd-alpha netbsd-amd64" \
-            " netbsd-armeb netbsd-arm netbsd-hppa netbsd-m32r" \
-            " netbsd-m68k netbsd-mips netbsd-mipsel netbsd-powerpc" \
-            " netbsd-ppc64 netbsd-s390 netbsd-s390x netbsd-sh3" \
-            " netbsd-sh3eb netbsd-sh4 netbsd-sh4eb netbsd-sparc" \
-            " openbsd-i386 openbsd-ia64 openbsd-alpha" \
-            " openbsd-amd64 openbsd-armeb openbsd-arm" \
-            " openbsd-hppa openbsd-m32r openbsd-m68k openbsd-mips" \
-            " openbsd-mipsel openbsd-powerpc openbsd-ppc64" \
-            " openbsd-s390 openbsd-s390x openbsd-sh3 openbsd-sh3eb" \
-            " openbsd-sh4 openbsd-sh4eb openbsd-sparc hurd-i386" \
-            " hurd-ia64 hurd-alpha hurd-amd64 hurd-armeb hurd-arm" \
-            " hurd-hppa hurd-m32r hurd-m68k hurd-mips" \
-            " hurd-mipsel hurd-powerpc hurd-ppc64 hurd-s390" \
-            " hurd-s390x hurd-sh3 hurd-sh3eb hurd-sh4" \
-            " hurd-sh4eb hurd-sparc".split(" ")
-    LICENSES = ["gpl", "lgpl", "bsd", "artistic", "shareware"]
 
     def __setitem__(self, path, files):
         if not type(files) == list:
@@ -167,6 +124,7 @@ class PyPackager(object):
         self.aegisManifest = ''
 
     def __repr__(self):
+        from ppkg_constants import PPKG_RETURN
         paths = self.__files.keys()
         paths.sort()
         files = []
@@ -186,27 +144,7 @@ class PyPackager(object):
                     self.postrm and "postrm", ]
         self.scripts = lscripts and \
             ", ".join([i for i in lscripts if i]) or "None"
-        return """
-----------------------------------------------------------------------
-NAME        : %(name)s
-----------------------------------------------------------------------
-LICENSE     : %(license)s
-URL         : %(url)s
-AUTHOR      : %(author)s
-MAIL        : %(email)s
-----------------------------------------------------------------------
-DEPENDS     : %(depends)s
-ARCH        : %(arch)s
-SECTION     : %(section)s
-----------------------------------------------------------------------
-DESCRIPTION :
-%(description)s
-----------------------------------------------------------------------
-SCRIPTS : %(scripts)s
-----------------------------------------------------------------------
-FILES :
-%(files)s
-""" % self.__dict__
+        return PPKG_RETURN % self.__dict__
 
     def _create_dist_folder(self):
         if not os.path.exists('dists'):
@@ -283,9 +221,9 @@ FILES :
             locale.setlocale(locale.LC_TIME, 'en_US')
         except:
             pass
-            
-        print os.path.join(_dist_dir, "%(name)s_%(version)s-" 
-                             "%(buildversion)s_%(arch)s.deb" % self.__dict__)
+
+        print os.path.join(_dist_dir, "%(name)s_%(version)s-"
+                           "%(buildversion)s_%(arch)s.deb" % self.__dict__)
         dsccontent = DscFile("%(version)s-%(buildversion)s" % self.__dict__,
                              "%(depends)s" % self.__dict__,
                              (os.path.join(_dist_dir, "%(name)s_%(version)s-"
@@ -338,23 +276,27 @@ FILES :
             pass
 
     def generate_common_source(self, _dist_dir):
+        from ppkg_constants import PPKG_SECTIONS, PPKG_ARCHS, PPKG_LICENSES, \
+            PPKG_DEBIAN_CHANGESLOG, PPKG_DEBIAN_CONTROL, PPKG_LICENSES_TEXT, \
+            PPKG_COPYRIGHT, PPKG_DEBIAN_RULE
+
         if not sum([len(i) for i in self.__files.values()]) > 0:
             raise PyPackagerException("no files are defined")
 
         if not self.changelog:
             self.changelog = "  * no changelog"
 
-        if self.section not in PyPackager.SECTIONS:
+        if self.section not in PPKG_SECTIONS:
             raise PyPackagerException("section '%s' is unknown (%s)"
                                       % (self.section,
                                       str(PyPackager.SECTIONS)))
 
-        if self.arch not in PyPackager.ARCHS:
+        if self.arch not in PPKG_ARCHS:
             raise PyPackagerException("arch '%s' is unknown (%s)"
                                       % (self.arch,
                                       str(PyPackager.ARCHS)))
 
-        if self.license not in PyPackager.LICENSES:
+        if self.license not in PPKG_LICENSES:
             raise PyPackagerException("License '%s' is unknown (%s)"
                                       % (license,
                                       str(PyPackager.LICENSES)))
@@ -446,12 +388,7 @@ FILES :
             #===================================================
             # CREATE debian/changelog
             #===================================================
-            clog = """%(name)s (%(version)s-%(buildversion)s) stable; urgency=low
-
-  %(changelog)s
-
- -- %(author)s <%(email)s>  %(buildDate)s
-  """ % self.__dict__
+            clog = PPKG_DEBIAN_CHANGESLOG % self.__dict__
 
             open(os.path.join(DEBIAN, "changelog"), "wb").write(clog)
 
@@ -484,222 +421,46 @@ FILES :
             if self.icon is not None and os.path.exists(self.icon):
                 try:
                     import base64
-                    iconb64 = "".join(base64.encodestring(open(self.icon).read()).split("\n")[0:-1])
+                    iconb64 = "".join(base64.encodestring(
+                        open(self.icon).read()).split("\n")[0:-1])
                     self.iconstr = "XB-Maemo-Icon-26: %s" % (iconb64)
                 except:
                     pass
+
             #===================================================
             # CREATE bugtracker
             #===================================================
             self.bugtrackerstr = "XSBC-Bugtracker: %s" % (self.bugtracker)
 
             self.build_depends = 'debhelper (>= 8.0.0)'
-            self.build_depends = self.build_depends + ", pkg-config, aegis-builder" if (self.aegisManifest) else ''
+            self.build_depends = self.build_depends \
+                + ", pkg-config, aegis-builder" \
+                if (self.aegisManifest) else ''
+
             #===================================================
             # CREATE debian/control
             #===================================================
-            txt = """Source: %(name)s
-Section: %(section)s
-Priority: optional
-Maintainer: %(maintainer)s <%(email)s>
-Build-Depends: %(build_depends)s
-Standards-Version: 3.9.2
-
-Package: %(name)s
-XB-Maemo-Display-Name: %(display_name)s
-Architecture: %(arch)s
-Depends: %(depends)s
-Suggests: %(suggests)s
-Description: %(description)s
-XB-Maemo-Upgrade-Description: %(upgrade_description)s
-XB-Maemo-Flags: %(maemo_flags)s
-XB-MeeGo-Desktop-Entry-Filename: %(meego_desktop_entry_filename)s
-%(bugtrackerstr)s
-%(iconstr)s""" % self.__dict__
+            txt = PPKG_DEBIAN_CONTROL % self.__dict__
 
             open(os.path.join(DEBIAN, "control"), "wb").write(txt)
 
             #===================================================
             # CREATE debian/copyright
             #===================================================
-            copy = {}
-            copy["gpl"] = """
-This package is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
 
-This package is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this package; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-On Debian systems, the complete text of the GNU General
-Public License can be found in `/usr/share/common-licenses/GPL'.
-"""
-            copy["lgpl"] = """
-This package is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
-
-This package is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public
-License along with this package; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-On Debian systems, the complete text of the GNU Lesser General
-Public License can be found in `/usr/share/common-licenses/LGPL'.
-"""
-            copy["bsd"] = """
-Redistribution and use in source and binary forms, with or without
-modification, are permitted under the terms of the BSD License.
-
-THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-SUCH DAMAGE.
-
-On Debian systems, the complete text of the BSD License can be
-found in `/usr/share/common-licenses/BSD'.
-"""
-            copy["shareware"] = """
-This product is copyrighted shareware, not public-domain software.
-You may use the unregistered version at no charge for an evaluation period.
-To continue to use the software beyond evaluation period, you must register it.
-
-THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
-WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES
-OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-"""
-            copy["artistic"] = """
-This program is free software; you can redistribute it and/or modify it
-under the terms of the "Artistic License" which comes with Debian.
-
-THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
-WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES
-OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-
-On Debian systems, the complete text of the Artistic License
-can be found in `/usr/share/common-licenses/Artistic'.
-"""
-
-            self.txtLicense = copy[self.license]
+            self.txtLicense = PPKG_LICENSES_TEXT[self.license]
             self.pv = __version__
-            txt = """This package was pypackaged(%(pv)s) by %(author)s <%(email)s> on
-%(buildDate)s.
-
-It was downloaded from %(url)s
-
-Upstream Author: %(author)s <%(email)s>
-
-Copyright: %(buildDateYear)s by %(author)s
-
-License:
-
-%(txtLicense)s
-
-The Debian packaging is (C) %(buildDateYear)s, %(author)s <%(email)s> and
-is licensed under the GPL, see above.
-
-
-# Please also look if there are files or directories which have a
-# different copyright/license attached and list them here.
-""" % self.__dict__
+            txt = PPKG_COPYRIGHT % self.__dict__
             open(os.path.join(DEBIAN, "copyright"), "wb").write(txt)
 
             #===================================================
             # CREATE debian/rules
             #===================================================
-            txt = """#!/usr/bin/make -f
-# -*- makefile -*-
-# Sample debian/rules that uses debhelper.
-# This file was originally written by Joey Hess and Craig Small.
-# As a special exception, when this file is copied by dh-make into a
-# dh-make output file, you may use that output file without restriction.
-# This special exception was added by Craig Small in version 0.37 of dh-make.
-
-# Uncomment this to turn on verbose mode.
-#export DH_VERBOSE=1
-
-CFLAGS = -Wall -g
-
-ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
-\tCFLAGS += -O0
-else
-\tCFLAGS += -O2
-endif
-
-configure: configure-stamp
-configure-stamp:
-\tdh_testdir
-\t# Add here commands to configure the package.
-\ttouch configure-stamp
-
-build: build-stamp
-
-build-stamp: configure-stamp
-\tdh_testdir
-\ttouch build-stamp
-
-clean:
-\tdh_testdir
-\tdh_testroot
-\trm -f build-stamp configure-stamp
-\tdh_clean
-
-install: build
-\tdh_testdir
-\tdh_testroot
-\tdh_clean -k
-\tdh_installdirs
-
-\t# ======================================================
-\t#$(MAKE) DESTDIR="$(CURDIR)/debian/%(name)s" install
-\tmkdir -p "$(CURDIR)/debian/%(name)s"
-
-\t%(rules)s
-\t# ======================================================
-
-# Build architecture-independent files here.
-binary-indep: build install
-# We have nothing to do by default.
-
-# Build architecture-dependent files here.
-binary-arch: build install
-\tdh_testdir
-\tdh_testroot
-\tdh_installchangelogs debian/changelog
-\tdh_installdocs
-\tdh_installexamples
-\tdh_installman
-\tdh_link
-\tdh_strip
-\tdh_compress
-\tdh_fixperms
-\tdh_installdeb
-\tdh_shlibdeps
-\tdh_gencontrol
-\tdh_md5sums
-\tdh_builddeb
-""" % self.__dict__
+            txt = PPKG_DEBIAN_RULE % self.__dict__
             if self.aegisManifest:
-                txt = txt + '\taegis-deb-add -control debian/%(name)s/DEBIAN/control .. debian/%(name)s.aegis=_aegis' % self.__dict__
+                txt = txt + ('\taegis-deb-add -control debian/%(name)s/'
+                             'DEBIAN/control ..'
+                             ' debian/%(name)s.aegis=_aegis' % self.__dict__)
             txt = txt + """
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install configure
@@ -712,7 +473,8 @@ binary: binary-indep binary-arch
             #===================================================
             if self.createDigsigsums:
                 from ppkg_digsigsums import generate_digsigsums
-                open(os.path.join(DEBIAN, "digsigsums"), "wb").write(generate_digsigsums(self.name, self.__files))
+                open(os.path.join(DEBIAN, "digsigsums"), "wb") \
+                    .write(generate_digsigsums(self.name, self.__files))
 
             #===================================================
             # CREATE debian/_aegis manifest
@@ -760,17 +522,7 @@ binary: binary-indep binary-arch
             except:
                 pass
 
-            #Specific for rpm
-            changeslog = ('* ' + time.strftime("%a %b %d %Y", time.gmtime())
-                          + (" %(author)s <%(email)s> - "
-                             "%(version)s-%(buildversion)s\n")
-                          % self.__dict__)
-            for index, line in enumerate(self.changelog.split('\n')):
-                if line.startswith('-'):
-                    changeslog = changeslog + line + '\n'
-                else:
-                    changeslog = changeslog + '- %s\n' % line
-            self.changeslog = changeslog
+            #Write spec
             self.builddepends = 'python-devel'
             if self.rpm_depends is None:
                 self.rpm_depends = self.depends
@@ -785,7 +537,24 @@ binary: binary-indep binary-arch
                                   "%(name)s_%(version)s"
                                   "-%(buildversion)s.spec"
                                   % self.__dict__), "wb")
+
+            #Write changes
+            changeslog = ('* ' + time.strftime("%a %b %d %Y", time.gmtime())
+                          + (" %(author)s <%(email)s> - "
+                             "%(version)s-%(buildversion)s\n")
+                          % self.__dict__)
+            for index, line in enumerate(self.changelog.split('\n')):
+                if line.startswith('-'):
+                    changeslog = changeslog + line + '\n'
+                else:
+                    changeslog = changeslog + '- %s\n' % line
+
             f.write(specfile.content)
+            f = open(os.path.join(_dist_dir,
+                                  "%(name)s_%(version)s"
+                                  "-%(buildversion)s.changes"
+                                  % self.__dict__), "wb")
+            f.write(changeslog)
             f.close()
 
             try:
