@@ -20,7 +20,7 @@ import time
 from glob import glob
 from datetime import datetime
 
-__version__ = '4.0.0'
+__version__ = '4.0.1'
 __build__ = '1'
 __author__ = "khertan"
 __mail__ = "khertan@khertan.net"
@@ -31,7 +31,8 @@ __changelog__ = '''* 3.6.0: Fix permission on script post/pre inst/rm."
 * 3.7.3 : add possibilities to have different dependancies for spec / deb
 * 4.0.0 : Put builded packages in different sub folder as changes file for
           debian and rpm source have same name but different structure.
-          Cleaning code'''
+          Cleaning code
+* 4.0.1 : Add readme.md in the package'''
 
 
 class PyPackagerException(Exception):
